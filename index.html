@@ -1,21 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Neckshift</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="icon.ico">
-
   <style>
     :root {
-      --bg-color: #0c0d08;
-      --text-color: #f0f0f0;
-      --accent-color: #f0f0f0;
-      --accent-hover: #c0c0c0;
-      --max-width: 720px;
-      --font-size-base: 1rem;
+      --bg-color: #B7AE94; /* fond beige sale */
+      --text-color: #1E1E1E;
+      --accent-color: #A3210A; /* rouge */
+      --green: #4CB292;
+      --blue: #1E7A98;
+      --font-size-base: 16px;
+      --max-width: 1024px;
     }
 
     * {
@@ -24,70 +21,83 @@
       padding: 0;
     }
 
-    html, body {
+    body {
       background-color: var(--bg-color);
       color: var(--text-color);
       font-family: 'Segoe UI', sans-serif;
       font-size: var(--font-size-base);
       line-height: 1.6;
-      min-height: 100vh;
+    }
+
+    header {
+      width: 100%;
+      background-color: var(--bg-color);
+      border-bottom: 2px solid var(--text-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: 500;
+      position: relative;
+    }
+
+    nav a::after {
+      content: "";
+      display: block;
+      width: 0;
+      height: 2px;
+      background: var(--accent-color);
+      transition: width 0.3s;
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+    }
+
+    nav a:hover::after {
+      width: 100%;
     }
 
     .container {
       max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 2rem 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
+      margin: 2rem auto;
+      padding: 1rem;
     }
 
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5em;
-    }
-
-    p {
-      font-size: 1.125rem;
-      opacity: 0.85;
-      margin-bottom: 2rem;
-    }
-
-    a.button {
-      display: inline-block;
-      padding: 0.9em 1.8em;
-      background-color: var(--accent-color);
-      color: var(--bg-color);
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 8px;
-      transition: background 0.2s ease;
-      font-size: 1rem;
-    }
-
-    a.button:hover {
-      background-color: var(--accent-hover);
-    }
-
-    @media screen and (min-width: 768px) {
-      h1 {
-        font-size: 3rem;
-      }
-      p {
-        font-size: 1.25rem;
-      }
-    }
   </style>
 </head>
 <body>
+  <header>
+    <div class="logo">Neckshift</div>
+    <nav>
+      <a href="#">Download</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
 
   <main class="container">
-    <h1>Neckshift</h1>
-    <p>Une app pensée pour les guitaristes et bassistes curieux.</p>
-    <a href="tonfichier.apk" class="button">📥 Télécharger l'app</a>
+    <h1>Welcome to Neckshift</h1>
+    <p>This is the homepage. More content coming soon...</p>
   </main>
-
 </body>
 </html>
+
