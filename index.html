@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <title>Neckshift</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="icon.png">
   <style>
     :root {
-      --bg-color: #B7AE94; /* fond beige sale */
+      --bg-color: #B7AE94;
       --text-color: #1E1E1E;
-      --accent-color: #A3210A; /* rouge */
+      --accent-color: #A3210A;
       --green: #4CB292;
       --blue: #1E7A98;
       --font-size-base: 16px;
@@ -76,15 +77,64 @@
       width: 100%;
     }
 
-    .container {
+    .main-content {
       max-width: var(--max-width);
-      margin: 2rem auto;
-      padding: 1rem;
+      margin: 3rem auto;
+      padding: 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .content-box {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 2rem;
+      width: 100%;
+    }
+
+    .icon-display img {
+      width: 150px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    .download-links {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .download-links a {
+      background-color: var(--blue);
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: bold;
+      text-align: center;
+      transition: background 0.2s ease;
+    }
+
+    .download-links a:hover {
+      background-color: var(--green);
+    }
+
+    @media (max-width: 768px) {
+      .content-box {
+        flex-direction: column;
+        align-items: center;
+      }
     }
 
   </style>
 </head>
 <body>
+
   <header>
     <div class="logo">Neckshift</div>
     <nav>
@@ -94,10 +144,18 @@
     </nav>
   </header>
 
-  <main class="container">
-    <h1>Welcome to Neckshift</h1>
-    <p>This is the homepage. More content coming soon...</p>
+  <main class="main-content">
+    <div class="content-box">
+      <div class="icon-display">
+        <img src="icon.png" alt="Neckshift Logo">
+      </div>
+      <div class="download-links">
+        <a href="#">Download Android</a>
+        <a href="#">Download iOS</a>
+      </div>
+    </div>
   </main>
+
 </body>
 </html>
 
