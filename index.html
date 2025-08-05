@@ -63,19 +63,8 @@
     }
 
     @media (max-width: 768px) {
-  .section {
-    padding: 0 10px !important;
-  }
-  .section > div {
-    padding: 20px 10px !important;
-  }
-  .section-title {
-    text-align: center !important;
-  }
-  .download-button-wrapper {
-    align-items: center !important;
-  }
       .section {
+        padding: 0 10px !important;
         margin-top: 30px !important;
       }
 
@@ -113,17 +102,17 @@
         text-align: left;
         padding: 0 10px;
       }
-    }
-      .section-title {
-      text-align: left;
-    }
 
-    @media (max-width: 768px) {
       .section-title {
         text-align: center !important;
       }
     }
-  body::before {
+
+    .section-title {
+      text-align: left;
+    }
+
+    body::before {
   content: "";
   position: fixed;
   top: 0;
@@ -135,10 +124,10 @@
   background-position: center;
   background-repeat: no-repeat;
   filter: blur(0px) brightness(0.4);
+  will-change: transform, filter;
   z-index: -1;
 }
-
-</style>
+  </style>
 </head>
 <body>
   <div class="section">
