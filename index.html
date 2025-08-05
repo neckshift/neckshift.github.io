@@ -121,10 +121,10 @@
   height: 100vh;
   background-image: url('background.jpeg');
   background-size: cover;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
-  filter: brightness(0.4);
-  will-change: opacity;
+  filter: blur(2px) brightness(0.4);
+  will-change: transform, filter;
   z-index: -1;
   pointer-events: none;
 }
