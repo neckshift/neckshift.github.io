@@ -15,54 +15,44 @@
       --font: 16px;
       --maxw: 960px;
     }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { background: var(--bg); color: var(--text);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Segoe UI', sans-serif;
-      font-size: var(--font); line-height:1.5; }
-    header { background: var(--bg); padding:1rem; border-bottom:2px solid var(--text);
-      position: sticky; top:0; z-index:10;
-      display:flex; justify-content:center; align-items:center; }
-    header .logo { display:flex; align-items:center; max-width: var(--maxw); width:100%; }
-    header .logo img { height: 60px; margin-right:1rem; }
-    nav { margin-left:auto; display:flex; gap:1rem; }
-    nav a { text-decoration:none; color: var(--text); font-weight:600;
-      position: relative; padding-bottom:2px; }
-    nav a::after { content:""; position:absolute; bottom:0; left:0; height:2px;
-      width:0; background: var(--accent); transition: width .3s; }
-    nav a:hover::after { width:100%; }
-    .hero { max-width:var(--maxw); margin:2rem auto; padding:1rem;
-      display:flex; flex-wrap:wrap; align-items:center; gap:2rem; }
-    .hero img { flex:0 0 200px; width:200px; max-width:100%; }
-    .hero .intro { flex:1; }
-    .hero .intro h1 { font-size:2.5rem; margin-bottom:.5em; }
-    .hero .intro p { font-size:1.25rem; margin-bottom:1em; }
-    .hero .intro a { background: var(--blue); color:#fff; padding:.75em 1.5em;
-      border-radius:6px; font-weight:bold; text-decoration:none;
-      transition: background .3s; }
-    .hero .intro a:hover { background: var(--green); }
-    @media (max-width:600px) {
-      .hero { flex-direction:column; text-align:center; }
+      font-size: var(--font);
+    }
+
+    .logo-container {
+      background-color: #111;
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .logo-container img {
+      height: 150px; /* ⇦ Tu peux ajuster ici (x3 ou x4 taille normale) */
+      width: auto;
+    }
+
+    @media (max-width: 600px) {
+      .logo-container {
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      .logo-container img {
+        height: 100px;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div class="logo">
-      <img src="neckshift-header.png" alt="Neckshift Logo">
-      <nav>
-        <a href="#">Download</a>
-        <a href="#">About</a>
-        <a href="#">Contact</a>
-      </nav>
-    </div>
-  </header>
-  <section class="hero">
-    <img src="icon.png" alt="Neckshift App Icon">
-    <div class="intro">
-      <h1>Neckshift</h1>
-      <p>App for curious guitarists and bassists. Analyze, transpose, learn.</p>
-      <a href="#">Download Android</a>
-    </div>
-  </section>
-</body>
-</html>
+
+  <!-- Bandeau noir avec logo en haut à gauche -->
+  <div class="logo-contain
