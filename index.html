@@ -63,6 +63,12 @@
     }
 
     @media (max-width: 768px) {
+  .section-title {
+    text-align: center !important;
+  }
+  .download-button-wrapper {
+    align-items: center !important;
+  }
       .section {
         margin-top: 30px !important;
       }
@@ -118,7 +124,7 @@
     <div style="background-color: #303030; border-radius: 16px; padding: 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 60px;">
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px;">
         <img src="icon.png" alt="NeckShift App Icon" style="width: 320px; height: 320px; border-radius: 20px;">
-        <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; margin-left: 40px;">
+        <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 20px; align-items: center; flex: 1;">
           <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
           <a href="#" download class="download-button">NeckShift v1 - macOS (.dmg)</a>
         </div>
