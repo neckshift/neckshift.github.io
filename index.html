@@ -123,7 +123,22 @@
         text-align: center !important;
       }
     }
-  </style>
+  body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('fond-du-site.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(0px) brightness(0.4);
+  z-index: -1;
+}
+
+</style>
 </head>
 <body>
   <div class="section">
