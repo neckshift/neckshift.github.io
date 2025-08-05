@@ -102,6 +102,15 @@
         padding: 0 10px;
       }
     }
+      .section-title {
+      text-align: left;
+    }
+
+    @media (max-width: 768px) {
+      .section-title {
+        text-align: center !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -109,13 +118,13 @@
     <div style="background-color: #303030; border-radius: 16px; padding: 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 60px;">
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px;">
         <img src="icon.png" alt="NeckShift App Icon" style="width: 320px; height: 320px; border-radius: 20px;">
-        <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: 20px; align-items: center; margin-left: 40px;">
           <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
           <a href="#" download class="download-button">NeckShift v1 - macOS (.dmg)</a>
         </div>
       </div>
       <div>
-        <h2 style="text-align: left;">Qu'est-ce que NeckShift ?</h2>
+        <h2 class="section-title">Qu'est-ce que NeckShift ?</h2>
         <p>
           NeckShift est un logiciel open-source et gratuit conçu pour explorer le manche de guitare de façon interactive.
         </p>
@@ -123,7 +132,7 @@
           Il permet de visualiser les gammes directement sur le manche, de sélectionner des notes librement, d’afficher les intervalles à partir d’une tonique, et de personnaliser l’accordage des cordes.
         </p>
         <br><br><br>
-        <h2>Fonctionnalités principales</h2>
+        <h2 class="section-title">Fonctionnalités principales</h2>
         <p>
           NeckShift propose une approche visuelle et interactive de l’étude du manche de guitare. Il affiche une représentation fidèle du manche avec 6 cordes et 17 cases, sur laquelle l’utilisateur peut sélectionner librement les notes.
         </p>
