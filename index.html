@@ -1,63 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Neckshift • Home</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="icon.png" type="image/png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeckShift</title>
+  <link rel="icon" type="image/png" href="icon.png">
   <style>
-    :root {
-      --bg: #B7AE94;
-      --text: #1E1E1E;
-      --accent: #A3210A;
-      --green: #4CB292;
-      --blue: #1E7A98;
-      --font: 16px;
-      --maxw: 960px;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', sans-serif;
-      font-size: var(--font);
-    }
-
-    .logo-container {
+      margin: 0;
+      font-family: Arial, sans-serif;
       background-color: #111;
-      padding: 2rem 3rem;
-      display: flex;
-      align-items: flex-start;
+      color: #ddd;
+      text-align: center;
     }
-
-    .logo-container img {
-      height: 150px; /* ⇦ Tu peux ajuster ici (x3 ou x4 taille normale) */
-      width: auto;
+    header {
+      background-color: #000;
+      padding: 20px;
     }
-
-    @media (max-width: 600px) {
-      .logo-container {
-        justify-content: center;
-        padding: 1.5rem;
-      }
-
-      .logo-container img {
-        height: 100px;
-      }
+    header img {
+      max-width: 300px;
+      height: auto;
+    }
+    .downloads {
+      margin: 40px 0;
+    }
+    .downloads a {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 20px;
+      background-color: #2a62b6;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+    .downloads a:hover {
+      background-color: #4a82e6;
+    }
+    .section {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #1a1a1a;
+      border-radius: 10px;
+    }
+    .section h2 {
+      color: #50b0ff;
+    }
+    footer {
+      margin-top: 60px;
+      padding: 20px;
+      color: #666;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="neckshift-header.png" alt="NeckShift Logo">
+  </header>
 
-  <!-- Bandeau noir avec logo en haut à gauche -->
-  <div class="logo-container">
-    <img src="neckshift-header.png" alt="Neckshift Logo">
+  <div class="downloads">
+    <a href="#" download>NeckShift v1 - Windows (.zip)</a>
+    <a href="#" download>NeckShift v1 - macOS (.dmg)</a>
   </div>
 
+  <div class="section">
+    <h2>Qu'est-ce que NeckShift ?</h2>
+    <p>
+      NeckShift est un projet web open-source, gratuit et expérimental basé sur HTML, CSS et JavaScript. Il s'agit d'un outil interactif pour explorer le manche d'une guitare. Cette première version (v1) est toujours en développement.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>Fonctionnalités principales</h2>
+    <p>
+      NeckShift permet d'afficher des gammes et des accords sur un manche de guitare virtuel, d'ajuster l'accordage des cordes, d'identifier automatiquement les accords joués, et d'afficher les intervalles dans une gamme sélectionnée. Plus d'informations seront bientôt ajoutées à l'aide des manuels inclus.
+    </p>
+  </div>
+
+  <footer>
+    &copy; 2025 NeckShift | Projet open-source sous licence MIT
+  </footer>
 </body>
 </html>
