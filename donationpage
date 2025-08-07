@@ -1,116 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeckShift</title>
-  <link rel="icon" type="image/png" href="NSicon1.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donation</title>
   <style>
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: #212121;
       color: #B3A8A8;
-      text-align: center;
-      line-height: 1.8;
       font-size: 16px;
-    }
-
-    .section {
-      max-width: 100%;
-      margin: 30px auto 60px;
-      padding: 0 40px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .section h2 {
-      color: #AA9E9E;
-      font-size: 24px;
-      margin-top: 40px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .section p {
-      margin: 24px auto;
-      max-width: 80ch;
-      font-size: 17px;
       line-height: 1.6;
-      text-align: left;
-      color: #AA9E9E;
-    }
-
-    .download-button {
-      display: inline-block;
-      width: 300px;
-      height: 70px;
-      line-height: 70px;
-      background: none;
-      color: #AA9E9E;
-      text-decoration: none;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 18px;
-      border: 1px solid #888;
-      transition: all 0.3s ease;
-    }
-
-    .download-button:hover {
-      background-color: #555;
-      color: #fff;
-    }
-
-    @media (max-width: 768px) {
-      .section {
-        padding: 0 10px !important;
-        margin-top: 30px !important;
-      }
-
-      .section > div {
-        padding: 30px 20px !important;
-      }
-
-      .section > div > div:first-child {
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 30px !important;
-      }
-
-      .section img {
-        width: 200px !important;
-        height: 200px !important;
-      }
-
-      .download-button {
-        width: 240px !important;
-        height: 60px !important;
-        line-height: 60px !important;
-        font-size: 17px !important;
-        padding: 0 10px;
-        margin-left: auto;
-        margin-right: auto;
-        display: block;
-      }
-
-      .section h2 {
-        text-align: center;
-      }
-
-      .section p {
-        text-align: left;
-        padding: 0 10px;
-      }
-
-      .section-title {
-        text-align: center !important;
-      }
-    }
-
-    .section-title {
-      text-align: left;
     }
 
     .background {
@@ -138,58 +39,5 @@
   <div class="background">
     <img src="createbackground.png" alt="Fond d'écran">
   </div>
-  <div class="section">
-    <div style="background-color: rgba(48, 48, 48, 0.6); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 40px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px;">
-  <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888; ">
-  <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 16px; align-items: center; flex: 1;">
-  <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
-  
-  <a href=\"donation.html\" class=\"download-button\">Donate</a>
-  <a href="donation.html" class="download-button">DONATE</a>
-</div>
-  
-</div>
-</div>
-
-
-</div>
-      <div>
-        <hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
-<h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
-        <p>
-          NeckShift est un logiciel gratuit conçu pour explorer le manche de guitare de façon interactive.
-        </p>
-        <p>
-          Ce logiciel s’adresse à la fois aux guitaristes débutants curieux de comprendre leur instrument, et aux musiciens avancés désireux d’explorer des structures plus complexes.
-        </p>
-        <p>
-          L’interface est pensée pour être fluide, épurée, et entièrement hors ligne. NeckShift utilise la notation musicale anglaise et ne nécessite aucune installation complexe : il suffit de le lancer.
-        </p>
-        
-
-        <h2 class="section-title"><em>Fonctionnalités principales</em></h2>
-        <p>NeckShift propose une approche visuelle et interactive de l’étude du manche de guitare. Il affiche une représentation fidèle du manche avec 6 cordes et 17 cases, sur laquelle l’utilisateur peut sélectionner librement les notes.</p>
-        <p>Ces notes détectent et affichent une grande variété de tonalités possibles, avec la possibilité de sélectionner et superposer une gamme sur le manche.</p>
-        <p>Il est également possible d’afficher les intervalles à partir d'une gamme choisie, ce qui permet de mieux comprendre la structure de cette gamme ou d'une position.</p>
-        <p>L’accordage de chaque corde peut être ajusté indépendamment, avec des options pour sauvegarder et restaurer ses accordages.</p>
-        <p>L'ensemble de l'affichage du manche est calculé dynamiquement et suit l'accordage de l'utilisateur, permettant ainsi d'explorer des positions de gammes personnalisées ou de retrouver des tonalités à partir d'accordages complexes.</p>
-        <hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
-        <h2 class="section-title"><em>Version à venir ?</em></h2>
-        <p>J’ai choisi de désigner cette version comme la v1 car elle marque une étape importante dans le développement du projet.</p>
-        <p>Plusieurs idées d’évolution sont déjà en réflexion pour l’avenir, comme l’ajout d’un mode 7 cordes pour guitare, d’un mode basse, ou encore d’un affichage symétrique guitare/basse répondant aux mêmes commandes.</p>
-        <p>Ces pistes sont encore en réflexion car je tiens à ce que l’interface reste épurée, claire et pratique à utiliser.</p>
-        <p>Développé sur mon temps libre, NeckShift m’a demandé beaucoup de travail et d’énergie, notamment pour corriger certains bugs. C’est un projet personnel auquel je tiens particulièrement.</p>
-        <p> Il m’a semblé aujourd’hui suffisamment stable, clair et utile pour que je puisse le partager avec vous.</p>
-        <p>N’hésitez pas à me faire part de vos retours, de vos suggestions ou à me signaler les bugs éventuels, qu’ils soient visuels ou liés aux fonctionnalités.</p>
-        <p> Vous pouvez le faire directement via le formulaire de contact. 
-<hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
-      </div>
-    </div>
-  </div>
-  <footer style="margin-top: -20px; margin-bottom: 40px;; font-size: 13px;">
-    Sous licence | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Intègre Tonal.js · MIT · © 2018 Danigb
-  </footer>
-
 </body>
 </html>
