@@ -143,12 +143,10 @@
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px;">
   <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888; ">
   <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 16px; align-items: center; flex: 1;">
-    <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
-    <a href="#" download class="download-button">NeckShift v1 - macOS (.dmg)</a>
-    <a href="donation.html" class="download-button">DONATE</a>
-  </div><a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
+  <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
   <a href="#" download class="download-button">NeckShift v1 - macOS (.dmg)</a>
-  <a href="#" class="download-button">DONATE</a>
+  <a href="donation.html" class="download-button">DONATE</a>
+</div>
   
 </div>
 </div>
