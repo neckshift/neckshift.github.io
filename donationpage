@@ -144,7 +144,8 @@
   <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888; ">
   <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 16px; align-items: center; flex: 1;">
   <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
-  <a href="#" download class="download-button">NeckShift v1 - macOS (.dmg)</a>
+  
+  <a href=\"donation.html\" class=\"download-button\">Donate</a>
   <a href="donation.html" class="download-button">DONATE</a>
 </div>
   
@@ -154,7 +155,8 @@
 
 </div>
       <div>
-        <h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
+        <hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
+<h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
         <p>
           NeckShift est un logiciel gratuit conçu pour explorer le manche de guitare de façon interactive.
         </p>
