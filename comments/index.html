@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NeckShift — Feedback</title>
+<style>
+  body{margin:0;background:#212121;color:#B3A8A8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:1000px;margin:40px auto;padding:0 24px}
+  .card{background:rgba(48,48,48,.6);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:28px 28px 20px;backdrop-filter:blur(12px)}
+  h1{color:#AA9E9E;margin:0 0 10px}
+  p.note{color:#AA9E9E;margin:6px 0 18px}
+  form{display:flex;flex-direction:column;gap:10px}
+  input,select,textarea{background:#2c2c2c;color:#ddd;border:1px solid #888;border-radius:8px;padding:10px}
+  textarea{min-height:140px;resize:vertical}
+  button{border:1px solid #888;background:none;color:#AA9E9E;border-radius:8px;padding:10px 16px;cursor:pointer}
+  button:hover{background:#555;color:#fff}
+  .comment{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 12px;margin-top:10px;background:rgba(255,255,255,.02)}
+  .meta{font-size:13px;color:#8f8f8f;margin-bottom:4px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Feedback & Comments</h1>
+      <p class="note">Share thanks, ideas or bug reports. A quick verification prevents spam.</p>
+
+      <form id="cform" autocomplete="off">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <input id="name" placeholder="Name (optional)" maxlength="40" style="flex:1 1 240px">
+          <select id="topic" style="flex:1 1 200px">
+            <option value="thanks">Thanks</option>
+            <option value="feature">Feature request</option>
+            <option value="bug">Bug report</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <textarea id="message" placeholder="Write your comment…" maxlength="1500" required></textarea>
+
+        <!-- Turnstile widget (clé publique) -->
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAABpxVooBfvzHUFKr" data-theme="dark"></div>
+
+        <button type="submit">Post comment</button>
+        <div id="status" class="note" aria-live="polite"></div>
+      </form>
+
+      <h2 style="color:#AA9E9E;margin-top:20px">Recent comments</h2>
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <script>
+    // ✅ Adresse de ton Worker Cloudflare
+    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
+
+    const list = document.getElementById('list');
+    const statusEl = document.getElementById('status');
+    const form = document.getElementById('cform');
+
+    function escapeHtml(s){return s.replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+    function linkify(s){return s.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
+
+    async function loadComments(){
+      try{
+        const r = await fetch(API_BASE + "/comments");
+        const data = await r.json();
+        list.innerHTML = "";
+        (data||[]).forEach(c=>{
+          const when = new Date(c.created_at||Date.now()).toLocaleString();
+          const el = document.createElement('div');
+          el.className = 'comment';
+          el.innerHTML =
+            `<div class="meta">${escapeHtml(c.name||'Anonymous')} • ${when} • ${escapeHtml(c.topic||'other')}</div>` +
+            `<div>${linkify(escapeHtml(c.message||''))}</div>`;
+          list.appendChild(el);
+        });
+      }catch(e){ console.error(e); }
+    }
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      statusEl.textContent = "";
+
+      const name = document.getElementById('name').value.trim().slice(0,40);
+      const topic = document.getElementById('topic').value;
+      const message = document.getElementById('message').value.trim();
+      const token = (window.turnstile && window.turnstile.getResponse) ? window.turnstile.getResponse() : "";
+
+      if(!message || message.length < 2){ statusEl.textContent = "Message is too short."; return; }
+      if(!token){ statusEl.textContent = "Please complete the verification."; return; }
+
+      try{
+        const r = await fetch(API_BASE + "/comments", {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ name, topic, message, token })
+        });
+        if(!r.ok){
+          const err = await r.json().catch(()=>({error:'unknown'}));
+          statusEl.textContent = err.error === 'captcha_failed' ? "Verification failed." :
+                                 err.error === 'rate_limited' ? "Please wait a bit before posting again." :
+                                 "Sorry, something went wrong.";
+          if(window.turnstile && window.turnstile.reset) window.turnstile.reset();
+          return;
+        }
+        statusEl.textContent = "Thanks! Your comment was posted.";
+        form.reset();
+        if(window.turnstile && window.turnstile.reset) window.turnstile.reset();
+        loadComments();
+      }catch(e){
+        console.error(e);
+        statusEl.textContent = "Network error. Please try again.";
+      }
+    });
+
+    loadComments();
+  </script>
+</body>
+</html>
