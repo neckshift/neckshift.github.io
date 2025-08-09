@@ -148,7 +148,8 @@
 
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
-    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev"; // remplace si tu changes de Worker
+    // ⚠️ Remplace API_BASE si tu changes de domaine Worker
+    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
     const API = API_BASE + "/comments";
 
     // Admin token stocké uniquement en session de l’onglet
@@ -190,9 +191,26 @@
       }
     });
 
-    adminUse.addEventListener("click", ()=>{
+    // ✅ Vérification côté serveur avant d'activer l'admin
+    adminUse.addEventListener("click", async ()=>{
       const t = adminPwd.value.trim();
       if (!t) return;
+
+      const resp = await fetch(API_BASE + "/admin/verify", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${t}` }
+      });
+
+      if (!resp.ok) {
+        alert("Wrong password. Admin mode not enabled.");
+        return;
+      }
+      const data = await resp.json().catch(()=>({ok:false}));
+      if (!data.ok) {
+        alert("Wrong password. Admin mode not enabled.");
+        return;
+      }
+
       ADMIN_TOKEN = t;
       sessionStorage.setItem("ns_admin_token", ADMIN_TOKEN);
       refreshAdminButton();
@@ -205,6 +223,33 @@
     });
 
     refreshAdminButton();
+
+    // ✅ Vérifier un token déjà en session au chargement
+    (async () => {
+      if (!ADMIN_TOKEN) { loadComments(); return; }
+      try {
+        const resp = await fetch(API_BASE + "/admin/verify", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${ADMIN_TOKEN}` }
+        });
+        if (!resp.ok) {
+          ADMIN_TOKEN = "";
+          sessionStorage.removeItem("ns_admin_token");
+          refreshAdminButton();
+        } else {
+          const data = await resp.json().catch(()=>({ok:false}));
+          if (!data.ok) {
+            ADMIN_TOKEN = "";
+            sessionStorage.removeItem("ns_admin_token");
+            refreshAdminButton();
+          }
+        }
+      } catch (e) {
+        console.warn("Admin verify failed:", e);
+        // on ne casse pas l'affichage publique
+      }
+      loadComments();
+    })();
 
     // ----- Liste des commentaires (avec reply inline pour admin)
     async function loadComments(){
@@ -352,7 +397,8 @@
       }
     });
 
-    loadComments();
+    // Premier chargement
+    // (la vérif admin se fait dans l'IIFE plus haut, puis on appelle loadComments())
   </script>
 </body>
 </html>
