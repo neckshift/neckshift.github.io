@@ -28,6 +28,8 @@
       height: 100%;
       object-fit: cover;
       filter: brightness(0.4);
+      pointer-events: none;
+      user-select: none;
     }
     .container {
       max-width: 800px;
@@ -38,26 +40,26 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
     }
-    h2 {
-      color: #AA9E9E;
-    }
+    h2 { color: #AA9E9E; text-align: center; }
+    p.note { color: #AA9E9E; text-align: center; margin-top: -6px; }
+
     form {
       display: flex;
       flex-direction: column;
       gap: 12px;
+      margin-top: 10px;
     }
     input, select, textarea {
       background: rgba(44,44,44,0.25);
       border: 1px solid rgba(255,255,255,0.25);
       color: #eee;
       padding: 10px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 15px;
     }
-    input::placeholder, textarea::placeholder {
-      color: #bbb;
-    }
+    input::placeholder, textarea::placeholder { color: #bbb; }
     input:focus, select:focus, textarea:focus {
       outline: none;
       border-color: rgba(255,255,255,0.45);
@@ -66,7 +68,6 @@
     button {
       background: none;
       color: #AA9E9E;
-      text-decoration: none;
       border-radius: 8px;
       text-align: center;
       font-size: 16px;
@@ -75,19 +76,29 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    button:hover {
-      background-color: #555;
-      color: #fff;
+    button:hover { background-color: #555; color: #fff; }
+
+    .status {
+      min-height: 22px;
+      font-size: 14px;
+      color: #d9bebe;
     }
+
     .comment {
-      background: rgba(44,44,44,0.4);
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 15px;
-      text-align: left;
+      background: rgba(44,44,44,0.40);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
     }
-    .comment strong {
-      color: #fff;
+    .comment strong { color: #fff; }
+    .meta { font-size: 13px; color: #8f8f8f; margin-bottom: 6px; }
+    .reply {
+      margin-top: 10px;
+      padding: 10px;
+      border-left: 3px solid #8aa;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -95,20 +106,31 @@
   <div class="background">
     <img src="../createbackground.png" alt="Background">
   </div>
+
   <div class="container">
     <h2>Comments</h2>
-    <p>Share thanks, ideas or bug reports.</p>
+    <p class="note">Share thanks, ideas or bug reports.</p>
 
-    <form id="commentForm">
-      <input type="text" id="name" placeholder="Your name" required>
+    <form id="commentForm" autocomplete="off" autocapitalize="off" autocorrect="off">
+      <input
+        type="text"
+        id="name"
+        name="ns-name"
+        placeholder="Your name (optional)"
+        maxlength="40"
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+      >
       <select id="topic">
-        <option value="Thanks">Thanks</option>
-        <option value="Idea">Idea</option>
-        <option value="Bug report">Bug report</option>
+        <option value="thanks">Thanks</option>
+        <option value="feature">Feature request</option>
+        <option value="bug">Bug report</option>
+        <option value="other">Other</option>
       </select>
-      <textarea id="message" placeholder="Write your comment..." rows="4" required></textarea>
+      <textarea id="message" placeholder="Write your comment..." rows="4" maxlength="1500" required></textarea>
 
-      <!-- Turnstile invisible widget -->
+      <!-- Turnstile invisible -->
       <div class="cf-turnstile"
            data-sitekey="0x4AAAAAABpxVooBfvzHUFKr"
            data-theme="dark"
@@ -116,33 +138,54 @@
            data-callback="onTurnstileOk"></div>
 
       <button type="submit">Post comment</button>
+      <div id="status" class="status" aria-live="polite"></div>
     </form>
 
+    <h3 style="color:#AA9E9E;margin-top:24px;">Recent comments</h3>
     <div id="list"></div>
   </div>
 
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
-    const API = "https://neckshift-comments.brd-louu.workers.dev/comments"; // à remplacer si nouveau Worker
+    const API = "https://neckshift-comments.brd-louu.workers.dev/comments"; // si tu changes de Worker, modifie ici
     let turnstileReady = false;
     window.onTurnstileOk = function(){ turnstileReady = true; };
 
-    async function loadComments() {
-      const res = await fetch(API);
-      const comments = await res.json();
-      const list = document.getElementById("list");
-      list.innerHTML = "";
-      comments.forEach(c => {
-        const div = document.createElement("div");
-        div.className = "comment";
-        div.innerHTML = `<strong>${c.name}</strong> <em>(${c.topic})</em><br>${c.message}`;
-        list.appendChild(div);
-      });
+    function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+    function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
+
+    // Charge et affiche la liste
+    async function loadComments(){
+      try{
+        const r = await fetch(API);
+        const data = await r.json();
+        const list = document.getElementById('list');
+        list.innerHTML = "";
+        (data||[]).forEach(c=>{
+          const when = new Date(c.created_at||Date.now()).toLocaleString();
+          const el = document.createElement('div');
+          el.className = 'comment';
+          el.innerHTML =
+            `<div class="meta">${escapeHtml(c.name || 'Anonymous')} • ${when} • ${escapeHtml(c.topic || 'other')}</div>` +
+            `<div>${linkify(escapeHtml(c.message || ''))}</div>`;
+          // Affiche une éventuelle réponse du dev (si tu ajoutes la feature côté Worker)
+          if (c.reply && c.reply.message) {
+            el.innerHTML += `<div class="reply"><strong>${escapeHtml(c.reply.by || 'Dev')}</strong><br>${linkify(escapeHtml(c.reply.message))}</div>`;
+          }
+          list.appendChild(el);
+        });
+      }catch(e){
+        console.error(e);
+      }
     }
 
-    document.getElementById("commentForm").addEventListener("submit", async (e) => {
+    // Submit
+    document.getElementById('commentForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = "";
 
+      // Demande à Turnstile de générer un token si besoin (mode invisible)
       if (window.turnstile && !turnstile.getResponse()) {
         await new Promise(resolve => {
           const t = setInterval(() => {
@@ -153,22 +196,45 @@
       }
       const token = (window.turnstile && window.turnstile.getResponse) ? window.turnstile.getResponse() : "";
 
-      const name = document.getElementById("name").value.trim();
-      const topic = document.getElementById("topic").value;
-      const message = document.getElementById("message").value.trim();
+      const name = document.getElementById('name').value.trim().slice(0,40);
+      const topic = document.getElementById('topic').value;
+      const message = document.getElementById('message').value.trim();
 
-      const res = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, topic, message, token })
-      });
+      if (!message || message.length < 2) {
+        statusEl.textContent = "Message is too short.";
+        return;
+      }
+      if (!token) {
+        statusEl.textContent = "Please complete the verification.";
+        return;
+      }
 
-      if (res.ok) {
-        document.getElementById("commentForm").reset();
-        if (window.turnstile) turnstile.reset();
+      try{
+        const r = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({ name, topic, message, token })
+        });
+
+        if(!r.ok){
+          const err = await r.json().catch(()=>({error:'unknown'}));
+          statusEl.textContent =
+            err.error === 'reserved_name' ? "That name is reserved." :
+            err.error === 'banned_word'   ? "Your message contains blocked terms." :
+            err.error === 'captcha_failed'? "Verification failed." :
+            err.error === 'rate_limited'  ? "Please wait a bit before posting again." :
+            "Sorry, something went wrong.";
+          if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
+          return;
+        }
+
+        statusEl.textContent = "Thanks! Your comment was posted.";
+        e.target.reset();
+        if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
         loadComments();
-      } else {
-        alert("Error posting comment");
+      }catch(e){
+        console.error(e);
+        statusEl.textContent = "Network error. Please try again.";
       }
     });
 
