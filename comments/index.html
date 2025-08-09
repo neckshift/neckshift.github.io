@@ -5,100 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NeckShift – Comments</title>
 <style>
-  :root {
-    --fg:#E9E3E3; --muted:#B3A8A8; --line:rgba(255,255,255,.14);
-    --bg:#121212; --glass:rgba(28,28,28,.65); --glass2:rgba(24,24,24,.85);
-    --green:#6ef0a8; --devBubble:rgba(120,200,170,.10);
-  }
+  :root{--fg:#E9E3E3;--muted:#B3A8A8;--line:rgba(255,255,255,.14);--bg:#121212;--glass:rgba(28,28,28,.65);--glass2:rgba(24,24,24,.85);--green:#6ef0a8;--devBubble:rgba(120,200,170,.10)}
   *{box-sizing:border-box}
-  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--fg); }
-  .background{ position:fixed; inset:0; z-index:-1; overflow:hidden }
-  .background img{ width:100%; height:100%; object-fit:cover; filter:brightness(.28) }
-  .wrap{ max-width:920px; margin:28px auto; padding:0 16px }
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);scrollbar-width:none}
+  ::-webkit-scrollbar{width:0;height:0}
+  .background{position:fixed;inset:0;z-index:-1;overflow:hidden}
+  .background img{width:100%;height:100%;object-fit:cover;filter:brightness(.28)}
+  .wrap{max-width:920px;margin:28px auto;padding:0 16px}
+  .sticky{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:var(--glass2);border:1px solid var(--line);border-radius:16px}
+  .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  h2{margin:0;font-size:20px;color:#e8dfdf;font-weight:600}
+  .btn,.btn-small{border:1px solid rgba(255,255,255,.3);background:none;color:var(--muted);border-radius:8px;cursor:pointer;transition:.2s}
+  .btn{padding:10px 12px;font-size:15px}.btn-small{padding:6px 9px;font-size:13px}
+  .btn:hover{background:#3d3d3d;color:#fff}
+  #adminPanel{display:none;gap:8px;align-items:center}
+  #adminPanel input{background:transparent;border:1px solid rgba(255,255,255,.25);color:#eee;border-radius:8px;padding:7px 9px}
 
-  /* sticky zone (form + tabs) */
-  .sticky { position:sticky; top:0; z-index:10; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    background:var(--glass2); border:1px solid var(--line); border-radius:16px; }
-  .head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-bottom:1px solid var(--line); }
-  h2 { margin:0; font-size:20px; color:#e8dfdf; font-weight:600 }
+  .tabs{display:flex;gap:8px;padding:10px 12px}
+  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--line);color:#cfc7c7;cursor:pointer;background:rgba(255,255,255,.02)}
+  .tab.active{color:#111;background:#bfe8d2;border-color:#bfe8d2}
 
-  /* admin button */
-  .btn, .btn-small{
-    border:1px solid rgba(255,255,255,.3); background:none; color:var(--muted);
-    border-radius:8px; cursor:pointer; transition:.2s; }
-  .btn{ padding:10px 12px; font-size:15px }
-  .btn-small{ padding:6px 9px; font-size:13px }
-  .btn:hover{ background:#3d3d3d; color:#fff }
-  #adminPanel{ display:none; gap:8px; align-items:center }
-  #adminPanel input{ background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:7px 9px }
+  .form{padding:12px;border-top:1px solid var(--line)}
+  .row{display:grid;grid-template-columns:1fr;gap:10px}
+  input[type="text"],textarea{background:rgba(44,44,44,.35);border:1px solid rgba(255,255,255,.25);color:#eee;padding:10px 12px;border-radius:10px;font-size:15px}
+  textarea{width:100%;min-height:110px;resize:vertical}
+  .post-btn{margin-top:10px}
 
-  /* tabs (forum-style) */
-  .tabs{ display:flex; gap:8px; padding:10px 12px; }
-  .tab{ padding:8px 12px; border-radius:10px; border:1px solid var(--line); color:#cfc7c7; cursor:pointer; background:rgba(255,255,255,.02) }
-  .tab.active{ color:#111; background:#bfe8d2; border-color:#bfe8d2 }
-
-  /* form */
-  .form { padding:12px; border-top:1px solid var(--line) }
-  .row { display:grid; grid-template-columns: 1fr auto; gap:10px; }
-  .row .field { display:flex; gap:10px; }
-  input[type="text"], textarea, select{
-    background: rgba(44,44,44,0.35); border:1px solid rgba(255,255,255,0.25);
-    color:#eee; padding:10px 12px; border-radius:10px; font-size:15px;
-  }
-  textarea{ width:100%; min-height:110px; resize:vertical }
-  /* name + topic on one line */
-  .mini{ width: 60% }   /* name smaller */
-  .topic{ width: 40% }  /* topic next to name */
-
-  /* custom transparent select (arrow hidden) */
-  select {
-    -webkit-appearance: none; -moz-appearance: none; appearance: none;
-    background: rgba(33,33,33,.25); backdrop-filter: blur(4px); border:1px solid rgba(255,255,255,.22); color:#dcd4d4;
-    padding-right: 28px; position: relative;
-  }
-  select::-ms-expand { display:none; }
-  /* fake arrow */
-  .select-wrap{ position:relative; }
-  .select-wrap:after{
-    content:""; position:absolute; right:10px; top:50%; width:8px; height:8px; border-right:2px solid #aaa; border-bottom:2px solid #aaa; transform:translateY(-50%) rotate(45deg); opacity:.7; pointer-events:none;
-  }
-  /* darker dropdown options (best-effort across browsers) */
-  select option{ background: rgba(10,10,10,.95); color:#eaeaea }
-
-  .post-btn { margin-top:10px; }
-
-  /* list */
-  .panel{ margin-top:14px; background:var(--glass); border:1px solid var(--line); border-radius:16px; }
-  .list{ padding:6px 12px; }
-  .item{ padding:14px 6px; border-bottom:1px solid var(--line) }
-  .item:last-child{ border-bottom:none }
-  .meta{ font-size:13px; color:#b6b6b6; margin-bottom:6px; }
-  .name{ font-weight:600; color:#f0eded }
-  .time{ color:#9e9e9e; margin-left:8px }
-  .text{ white-space:pre-wrap; line-height:1.6; color:#e9e3e3 }
-
-  /* dev reply bubble, indented */
-  .reply { margin-top:10px; margin-left:12px; padding:10px 12px; border-left:3px solid var(--green);
-    background: var(--devBubble); border-radius:10px }
-  .reply .by{ color:var(--green); font-weight:600; margin-right:6px }
-
-  /* admin actions (only if admin ON) */
-  .admin-actions{ display:flex; gap:6px; margin-top:8px }
-
-  /* own-actions for visitors (only if owner) */
-  .own-actions{ display:flex; gap:6px; margin-top:8px }
-
-  /* reply-to-dev box for users */
-  .replybox{ display:none; margin-top:8px }
-  .replybox textarea{ width:100%; min-height:80px }
-
-  /* remove ugly white scrollbar on some browsers */
-  ::-webkit-scrollbar{ width:0; height:0 }
-  body{ scrollbar-width: none }
-
-  /* links */
-  a{ color:#bfe8d2; text-decoration:none }
-  a:hover{ text-decoration:underline }
+  .panel{margin-top:14px;background:var(--glass);border:1px solid var(--line);border-radius:16px}
+  .list{padding:6px 12px}
+  .thread{padding:14px 10px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .thread:nth-child(odd){background:rgba(0,0,0,.18)} /* alternance par fil */
+  .meta{font-size:13px;color:#b6b6b6;margin-bottom:6px}
+  .name{font-weight:600;color:#f0eded}.time{color:#9e9e9e;margin-left:8px}
+  .text{white-space:pre-wrap;line-height:1.6;color:#e9e3e3}
+  .dev-reply{margin-top:10px;margin-left:12px;padding:10px 12px;border-left:3px solid var(--green);background:var(--devBubble);border-radius:10px}
+  .dev-reply .by{color:var(--green);font-weight:600;margin-right:6px}
+  .user-follow{margin-top:8px;margin-left:12px;padding-left:12px;border-left:2px solid rgba(255,255,255,.15);color:#ddd}
+  .actions{display:flex;gap:6px;margin-top:8px}
+  .inlinebox{display:none;margin-top:8px}
+  .inlinebox textarea{width:100%;min-height:80px}
 </style>
 </head>
 <body>
@@ -118,29 +63,18 @@
         </div>
       </div>
 
-      <!-- forum-like tabs -->
       <div class="tabs">
         <button class="tab active" data-topic="thanks">Thanks</button>
         <button class="tab" data-topic="feature">Feature request</button>
         <button class="tab" data-topic="bug">Bug report</button>
       </div>
 
-      <!-- form -->
       <div class="form">
         <div class="row">
-          <div class="field">
-            <input class="mini" type="text" id="name" placeholder="Your name (optional)" maxlength="40">
-            <div class="select-wrap"><select class="topic" id="topic">
-              <option value="thanks">Thanks</option>
-              <option value="feature">Feature request</option>
-              <option value="bug">Bug report</option>
-            </select></div>
-          </div>
-        </div>
-        <div style="margin-top:10px">
+          <input type="text" id="name" placeholder="Your name (optional)" maxlength="40">
           <textarea id="message" placeholder="Write your comment..." maxlength="1500" required></textarea>
           <button id="postBtn" class="btn post-btn">Post comment</button>
-          <div id="status" style="margin-top:6px; font-size:14px; color:#d9bebe"></div>
+          <div id="status" style="margin-top:6px;font-size:14px;color:#d9bebe"></div>
         </div>
       </div>
     </div>
@@ -151,7 +85,6 @@
   </div>
 
 <script>
-  // === Config
   const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
   const API = API_BASE + "/comments";
 
@@ -159,27 +92,27 @@
   let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
   const isAdmin = () => !!ADMIN_TOKEN;
 
-  // Optional: per-visitor owner token (for edit/delete own) – only works if Worker patch is added
+  // Owner token (for edit/delete own top-level)
   const OWNER_TOKEN_KEY = "ns_owner_token";
   if (!localStorage.getItem(OWNER_TOKEN_KEY)) {
     const t = crypto.getRandomValues(new Uint8Array(16)).reduce((s,b)=>s+("0"+b.toString(16)).slice(-2),"");
     localStorage.setItem(OWNER_TOKEN_KEY, t);
   }
   const OWNER_TOKEN = localStorage.getItem(OWNER_TOKEN_KEY);
+  const OWNED_KEY = "ns_owned_ids";
 
-  // Utils
+  // UI helpers
   function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
   function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
   function fmtDate(s){ try{ return new Date(s||Date.now()).toLocaleString(); }catch{ return ""; } }
 
-  // Tabs (filter by topic)
+  // Tabs
   let currentTopic = "thanks";
   document.querySelectorAll(".tab").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
       currentTopic = btn.dataset.topic;
-      document.getElementById("topic").value = currentTopic; // default for new post
       loadComments();
     });
   });
@@ -202,9 +135,7 @@
         ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token");
         refreshAdminUI(); loadComments();
       }
-    } else {
-      adminPanel.style.display="flex"; adminPwd.value=""; adminPwd.focus();
-    }
+    } else { adminPanel.style.display="flex"; adminPwd.value=""; adminPwd.focus(); }
   });
   adminUse.addEventListener("click", async ()=>{
     const t = adminPwd.value.trim(); if (!t) return;
@@ -217,40 +148,38 @@
   adminCancel.addEventListener("click", ()=>{ adminPanel.style.display="none"; adminPwd.value=""; });
   refreshAdminUI();
 
-  // Post
+  // Post top-level
   document.getElementById("postBtn").addEventListener("click", submitComment);
   async function submitComment(){
     const statusEl = document.getElementById('status');
     statusEl.textContent = "";
     const name = document.getElementById('name').value.trim().slice(0,40);
-    const topic = document.getElementById('topic').value;
     const message = document.getElementById('message').value.trim();
-
     if (!message || message.length < 2) { statusEl.textContent = "Message is too short."; return; }
 
     try{
       const r = await fetch(API, {
         method:"POST",
         headers:{ "Content-Type":"application/json" },
-        // NOTE: owner token only used if you add the worker patch at the bottom
-        body: JSON.stringify({ name, topic, message, owner: OWNER_TOKEN })
+        body: JSON.stringify({ name, topic: currentTopic, message, owner: OWNER_TOKEN })
       });
       const data = await r.json().catch(()=>null);
       if (!r.ok) {
         statusEl.textContent =
           data?.error === 'rate_limited' ? "Please wait a minute before posting again." :
-          data?.error === 'invalid_topic' ? "Invalid topic." :
-          "Sorry, something went wrong.";
+          data?.error || "Sorry, something went wrong.";
         return;
       }
       document.getElementById('message').value = "";
+
+      // remember ownership
+      const arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]");
+      if (!arr.includes(data.id)) { arr.push(data.id); localStorage.setItem(OWNED_KEY, JSON.stringify(arr)); }
+
       loadComments();
-    }catch(e){
-      console.error(e); statusEl.textContent = "Network error. Please try again.";
-    }
+    }catch(e){ console.error(e); statusEl.textContent = "Network error. Please try again."; }
   }
 
-  // Render
   async function loadComments(){
     try{
       const r = await fetch(API);
@@ -259,10 +188,12 @@
       const list = document.getElementById('list');
       list.innerHTML = "";
 
+      const owned = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]");
+
       data.forEach(c=>{
-        const el = document.createElement('div');
-        el.className = 'item';
-        el.dataset.id = c.id;
+        const wrap = document.createElement('div');
+        wrap.className = 'thread';
+        wrap.dataset.id = c.id;
 
         let html =
           `<div class="meta">
@@ -271,61 +202,58 @@
            </div>
            <div class="text">${linkify(escapeHtml(c.message || ''))}</div>`;
 
-        // dev replies (array or legacy single)
-        if (Array.isArray(c.replies) && c.replies.length) {
-          c.replies.forEach(r=>{
-            html += `<div class="reply">
-                       <span class="by">Anatomie Sonore</span>
-                       <span>${linkify(escapeHtml(r.message||''))}</span>
-                     </div>`;
-          });
-        } else if (c.reply && c.reply.message) {
-          html += `<div class="reply">
-                     <span class="by">Anatomie Sonore</span>
-                     <span>${linkify(escapeHtml(c.reply.message||''))}</span>
-                   </div>`;
-        }
+        // thread entries (dev + user follow-ups)
+        const t = Array.isArray(c.thread) ? c.thread : [];
+        t.forEach(entry=>{
+          if (entry.by === 'dev') {
+            html += `<div class="dev-reply"><span class="by">Anatomie Sonore</span> ${linkify(escapeHtml(entry.message||''))}</div>`;
+          } else {
+            html += `<div class="user-follow"><span class="name">${escapeHtml(entry.name||'Anonymous')}</span> — ${linkify(escapeHtml(entry.message||''))}</div>`;
+          }
+        });
 
-        // Admin actions (reply/delete)
+        // actions
         if (isAdmin()) {
-          html += `<div class="admin-actions">
+          html += `<div class="actions">
                      <button class="btn-small" data-action="reply">Reply</button>
                      <button class="btn-small" data-action="delete">Delete</button>
                    </div>
-                   <div class="replybox">
+                   <div class="inlinebox">
                      <textarea placeholder="Write a dev reply…"></textarea>
-                     <div style="display:flex; gap:6px; margin-top:6px">
+                     <div class="actions">
                        <button class="btn-small" data-action="send-reply">Send</button>
                        <button class="btn-small" data-action="cancel-reply">Cancel</button>
                      </div>
                    </div>`;
         } else {
-          // User can "reply to dev" (just creates a new comment quoting dev)
-          // Also (optional) edit/delete own comment if worker patch is added
-          html += `<div class="own-actions">`;
-          if (Array.isArray(c.replies) && c.replies.length) {
-            html += `<button class="btn-small" data-action="reply-to-dev">Reply to dev</button>`;
-          }
-          // These two buttons will only work if you add the worker patch below; otherwise they stay hidden
-          html += `<button class="btn-small own-edit" data-action="edit" style="display:none">Edit</button>
-                   <button class="btn-small own-del" data-action="del" style="display:none">Delete</button>
+          html += `<div class="actions">
+                     <button class="btn-small" data-action="reply-to-dev">Reply to dev</button>
+                     ${owned.includes(c.id) ? `<button class="btn-small" data-action="edit">Edit</button>
+                                               <button class="btn-small" data-action="del">Delete</button>` : ``}
+                   </div>
+                   <div class="inlinebox">
+                     <textarea placeholder="Write your reply to dev…"></textarea>
+                     <div class="actions">
+                       <button class="btn-small" data-action="send-user">Send</button>
+                       <button class="btn-small" data-action="cancel-user">Cancel</button>
+                     </div>
                    </div>`;
         }
 
-        el.innerHTML = html;
-        list.appendChild(el);
+        wrap.innerHTML = html;
+        list.appendChild(wrap);
 
-        // Wire actions
+        // wire
         if (isAdmin()) {
-          const box = el.querySelector('.replybox');
+          const box = wrap.querySelector('.inlinebox');
           const ta  = box?.querySelector('textarea');
-          el.querySelector('[data-action="reply"]')?.addEventListener('click', ()=>{
-            box.style.display = 'block'; ta.value=""; ta.focus();
+          wrap.querySelector('[data-action="reply"]')?.addEventListener('click', ()=>{
+            box.style.display='block'; ta.value=""; ta.focus();
           });
-          el.querySelector('[data-action="cancel-reply"]')?.addEventListener('click', ()=>{
-            box.style.display = 'none'; ta.value="";
+          wrap.querySelector('[data-action="cancel-reply"]')?.addEventListener('click', ()=>{
+            box.style.display='none'; ta.value="";
           });
-          el.querySelector('[data-action="send-reply"]')?.addEventListener('click', async ()=>{
+          wrap.querySelector('[data-action="send-reply"]')?.addEventListener('click', async ()=>{
             const text = (ta.value||"").trim(); if (!text) return;
             const rr = await fetch(`${API}/${c.id}/reply`, {
               method:"POST",
@@ -335,8 +263,8 @@
             if (!rr.ok){ alert("Reply failed"); return; }
             loadComments();
           });
-          el.querySelector('[data-action="delete"]')?.addEventListener('click', async ()=>{
-            if (!confirm('Delete this comment?')) return;
+          wrap.querySelector('[data-action="delete"]')?.addEventListener('click', async ()=>{
+            if (!confirm('Delete this thread?')) return;
             const rr = await fetch(`${API}/${c.id}`, {
               method:"DELETE",
               headers:{ "Authorization":`Bearer ${ADMIN_TOKEN}` }
@@ -345,49 +273,44 @@
             loadComments();
           });
         } else {
-          // Visitor actions
-          const replyDevBtn = el.querySelector('[data-action="reply-to-dev"]');
-          replyDevBtn?.addEventListener('click', ()=>{
-            // open quick composer prefilled
-            currentTopic = c.topic; // stay in same topic
-            document.querySelectorAll(".tab").forEach(b=>{
-              b.classList.toggle("active", b.dataset.topic===currentTopic);
-            });
-            const ta = document.getElementById('message');
-            const n = document.getElementById('name').value.trim();
-            ta.value = (ta.value? ta.value+"\n":"") + `@Anatomie Sonore `;
-            ta.focus();
+          const box = wrap.querySelector('.inlinebox');
+          const ta  = box?.querySelector('textarea');
+          wrap.querySelector('[data-action="reply-to-dev"]')?.addEventListener('click', ()=>{
+            box.style.display='block'; ta.value=""; ta.focus();
           });
-
-          // Show edit/delete only if this browser owns the comment (requires worker patch)
-          // We detect ownership by storing comment IDs after posting (localStorage)
-          const OWNED = JSON.parse(localStorage.getItem("ns_owned_ids")||"[]");
-          if (OWNED.includes(c.id)) {
-            el.querySelector('.own-edit')?.setAttribute('style','');
-            el.querySelector('.own-del')?.setAttribute('style','');
-          }
-
-          el.querySelector('[data-action="del"]')?.addEventListener('click', async ()=>{
-            if (!confirm('Delete your comment?')) return;
-            const rr = await fetch(`${API}/${c.id}`, {
-              method:"DELETE",
-              headers:{ "Authorization": `Bearer owner:${OWNER_TOKEN}` } // needs worker patch
+          wrap.querySelector('[data-action="cancel-user"]')?.addEventListener('click', ()=>{
+            box.style.display='none'; ta.value="";
+          });
+          wrap.querySelector('[data-action="send-user"]')?.addEventListener('click', async ()=>{
+            const text = (ta.value||"").trim(); if (!text) return;
+            const rr = await fetch(`${API}/${c.id}/followup`, {
+              method:"POST",
+              headers:{ "Content-Type":"application/json" },
+              body: JSON.stringify({ name: document.getElementById('name').value.trim().slice(0,40), message: text })
             });
-            if (!rr.ok){ alert("Delete failed"); return; }
-            // remove from owned list
-            const arr = JSON.parse(localStorage.getItem("ns_owned_ids")||"[]").filter(id=>id!==c.id);
-            localStorage.setItem("ns_owned_ids", JSON.stringify(arr));
+            if (!rr.ok){ alert("Send failed"); return; }
             loadComments();
           });
 
-          el.querySelector('[data-action="edit"]')?.addEventListener('click', async ()=>{
+          // owner edit/del
+          wrap.querySelector('[data-action="del"]')?.addEventListener('click', async ()=>{
+            if (!confirm('Delete your thread?')) return;
+            const rr = await fetch(`${API}/${c.id}`, {
+              method:"DELETE",
+              headers:{ "Authorization": `Bearer owner:${OWNER_TOKEN}` }
+            });
+            if (!rr.ok){ alert("Delete failed"); return; }
+            const arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]").filter(id=>id!==c.id);
+            localStorage.setItem(OWNED_KEY, JSON.stringify(arr));
+            loadComments();
+          });
+          wrap.querySelector('[data-action="edit"]')?.addEventListener('click', async ()=>{
             const cur = prompt("Edit your message:", c.message||"");
             if (cur==null) return;
-            const txt = String(cur).trim();
-            if (!txt) return;
+            const txt = String(cur).trim(); if (!txt) return;
             const rr = await fetch(`${API}/${c.id}`, {
               method:"PATCH",
-              headers:{ "Content-Type":"application/json", "Authorization": `Bearer owner:${OWNER_TOKEN}` }, // needs worker patch
+              headers:{ "Content-Type":"application/json", "Authorization": `Bearer owner:${OWNER_TOKEN}` },
               body: JSON.stringify({ message: txt })
             });
             if (!rr.ok){ alert("Edit failed"); return; }
@@ -398,42 +321,7 @@
     }catch(e){ console.error(e); }
   }
 
-  // after posting, remember owned id (so edit/delete buttons can appear next render)
-  // We intercept the POST to add the id to localStorage; easiest is to monkey patch fetch, but simpler:
-  // We'll override submitComment to push id after success. Already handled above? Not yet. Let's attach here:
-  (function hookOwned(){
-    const orig = submitComment;
-    window.submitComment = async function(){
-      const before = await fetch(API).then(r=>r.json()).catch(()=>[]);
-      await orig();
-      const after = await fetch(API).then(r=>r.json()).catch(()=>[]);
-      // naive diff: find the newest id not in before
-      const beforeIds = new Set((before||[]).map(x=>x.id));
-      const newest = (after||[]).find(x=>!beforeIds.has(x.id));
-      if (newest) {
-        const arr = JSON.parse(localStorage.getItem("ns_owned_ids")||"[]");
-        if (!arr.includes(newest.id)) {
-          arr.push(newest.id);
-          localStorage.setItem("ns_owned_ids", JSON.stringify(arr));
-        }
-      }
-    }
-  })();
-
-  // init: set default tab/topic based on URL hash ?t=feature
-  (function initTabByURL(){
-    const u = new URL(location.href);
-    const t = u.searchParams.get("t");
-    if (t && ["thanks","feature","bug"].includes(t)) {
-      currentTopic = t;
-      document.querySelectorAll(".tab").forEach(b=>{
-        b.classList.toggle("active", b.dataset.topic===currentTopic);
-      });
-      document.getElementById("topic").value = currentTopic;
-    }
-  })();
-
-  // verify admin token if any then load
+  // init + admin verify then load
   (async ()=>{
     if (isAdmin()) {
       try {
