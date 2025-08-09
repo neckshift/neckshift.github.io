@@ -22,12 +22,22 @@
       --card: rgba(48,48,48,0.6);
       --border: rgba(255,255,255,0.1);
       --btn-border:#888;
-      --btn-bg-r:43;  /* 2b */
+      --btn-text:#e9e9e9;
+
+      /* Download button background color (2b2b2b) managed via rgba with alpha */
+      --btn-bg-r:43;  /* 0x2b */
       --btn-bg-g:43;
       --btn-bg-b:43;
-      --btn-bg-alpha:0.30;    /* 30% de fond */
+      --btn-bg-alpha:0.30;    /* 30% base opacity */
       --btn-bg-hover-alpha:0.60;
-      --btn-text:#e9e9e9;
+
+      /* Menu sizing (shared) */
+      --menu-height:40px;
+      --menu-pad-y:8px;
+      --menu-pad-x:12px;
+      --menu-radius:10px;
+      --menu-gap:16px;
+      --menu-font:15px;
     }
 
     body {
@@ -67,16 +77,16 @@
       color: var(--muted);
     }
 
-    /* Boutons de téléchargement – largeur de la bulle, fond transparent 30% */
+    /* Download buttons – full width of the bubble, 30% background opacity, text fully opaque */
     .download-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      width: 100%;               /* pleine largeur de la bulle */
+      width: 100%;
       height: 70px;
       background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha));
-      color: var(--btn-text);    /* texte 100% opaque */
+      color: var(--btn-text);
       text-decoration: none;
       border-radius: 12px;
       text-align: center;
@@ -104,86 +114,76 @@
       width:22px;height:22px;flex:none;opacity:1;
     }
 
-    /* Barre de menu – largeur de la bulle */
-    .menu-bar-wrap{
-      width: 100%;
-    }
+    /* Menu bar – full bubble width, equal-sized controls */
     .menu-bar {
-      width: 100%;               /* occupe la largeur de la bulle */
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 16px;
-      margin: 0;                 /* serré au liseret qu’on place dessous */
+      gap: var(--menu-gap);
+      margin: 0;               /* pas de liseret dessous */
       flex-wrap: wrap;
     }
-    .menu-button, .kofi-button {
-      padding: 10px 16px;
+
+    /* Base style shared by Comments / Ko-Fi / Lang container */
+    .menu-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--menu-height);
+      padding: var(--menu-pad-y) var(--menu-pad-x);
+      border-radius: var(--menu-radius);
+      border: 1px solid var(--btn-border);
       background: none;
       color: var(--muted);
-      border: 1px solid var(--btn-border);
-      border-radius: 10px;
       text-decoration: none;
-      transition: background .2s ease, color .2s ease, border-color .2s ease;
-      font-size: 15px;
+      font-size: var(--menu-font);
       line-height: 1;
+      transition: background .2s ease, color .2s ease, border-color .2s ease;
     }
-    .menu-button:hover, .kofi-button:hover {
+    .menu-chip:hover {
       background: #555;
       color: #fff;
       border-color: #9a9a9a;
     }
 
+    /* Language switch looks like a single chip (same size) containing two inner buttons */
     .lang-switch {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid var(--btn-border);
-      border-radius: 10px;
-      padding: 6px 10px;
-      background: none;
     }
     .lang-switch button{
       background: none;
       border: none;
-      color: var(--muted);
+      color: inherit;
       cursor: pointer;
       padding: 6px 10px;
       border-radius: 8px;
       font-size: 14px;
+      line-height: 1;
     }
     .lang-switch button.active{
       background: #505050;
       color: #fff;
     }
-    .lang-switch svg{width:18px;height:18px;opacity:.9}
+    .lang-switch svg{width:18px;height:18px;opacity:.9;margin-right:6px}
 
     @media (max-width: 768px) {
       .section {
         padding: 0 10px !important;
         margin-top: 30px !important;
       }
-
       .section > div {
         padding: 30px 20px !important;
       }
-
       .section > div > div:first-child {
         flex-direction: column !important;
         align-items: center !important;
         gap: 30px !important;
       }
-
-      .section img {
-        width: 200px !important;
-        height: 200px !important;
-      }
-
-      .download-button {
-        height: 60px !important;
-        font-size: 17px !important;
-      }
-
+      .section img { width: 200px !important; height: 200px !important; }
+      .download-button { height: 60px !important; font-size: 17px !important; }
       .section h2 { text-align: center; }
       .section p { text-align: left; padding: 0 10px; }
       .section-title { text-align: center !important; }
@@ -192,17 +192,11 @@
     .section-title { text-align: left; }
 
     .background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      z-index: -1; overflow: hidden;
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
     }
     .background img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      filter: brightness(0.4);
-      will-change: transform, filter;
-      pointer-events: none; user-select: none;
+      width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4);
+      will-change: transform, filter; pointer-events: none; user-select: none;
     }
   </style>
 </head>
@@ -214,7 +208,7 @@
   <div class="section">
     <div style="background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 32px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);">
       
-      <!-- Top / Hero (boutons = largeur bulle) -->
+      <!-- Top / Hero -->
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 40px; flex-wrap: wrap; width:100%;">
         <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888;">
         <div class="download-button-wrapper" style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
@@ -237,22 +231,18 @@
         </div>
       </div>
 
-      <!-- MENU (au-dessus du liseret) -->
-      <div class="menu-bar-wrap">
-        <div class="menu-bar">
-          <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
-          <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
-          <div class="lang-switch" aria-label="Language">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2m7.93 8h-3.18a15.7 15.7 0 00-1.2-5A8.021 8.021 0 0119.93 10M12 4a13.7 13.7 0 011.77 6H10.23A13.7 13.7 0 0112 4M4.07 10A8.021 8.021 0 0110.38 5a15.7 15.7 0 00-1.2 5H4.07m0 4h3.18a15.7 15.7 0 001.2 5A8.021 8.021 0 014.07 14M12 20a13.7 13.7 0 01-1.77-6h3.54A13.7 13.7 0 0112 20m1.62-.38a15.7 15.7 0 001.2-5h3.18a8.021 8.021 0 01-4.38 5M7 14a13.7 13.7 0 01-.23-2c0-.68.08-1.34.23-2h10a13.7 13.7 0 01.23 2 13.7 13.7 0 01-.23 2z"/></svg>
-            <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
-            <button type="button" id="btn-fr" onclick="setLang('fr')">Français</button>
-          </div>
+      <!-- MENU (full width, no separator below) -->
+      <div class="menu-bar">
+        <a href="https://neckshift.github.io/comments" class="menu-chip">Comments</a>
+        <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="menu-chip">Support me on Ko-Fi</a>
+        <div class="menu-chip lang-switch" aria-label="Language">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2m7.93 8h-3.18a15.7 15.7 0 00-1.2-5A8.021 8.021 0 0119.93 10M12 4a13.7 13.7 0 011.77 6H10.23A13.7 13.7 0 0112 4M4.07 10A8.021 8.021 0 0110.38 5a15.7 15.7 0 00-1.2 5H4.07m0 4h3.18a15.7 15.7 0 001.2 5A8.021 8.021 0 014.07 14M12 20a13.7 13.7 0 01-1.77-6h3.54A13.7 13.7 0 0112 20m1.62-.38a15.7 15.7 0 001.2-5h3.18a8.021 8.021 0 01-4.38 5M7 14a13.7 13.7 0 01-.23-2c0-.68.08-1.34.23-2h10a13.7 13.7 0 01.23 2 13.7 13.7 0 01-.23 2z"/></svg>
+          <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
+          <button type="button" id="btn-fr" onclick="setLang('fr')">Français</button>
         </div>
-        <!-- Liseret immédiatement sous le menu (proche) -->
-        <hr style="border:none; border-top:1px solid var(--line); margin: 8px 0 0;">
       </div>
 
-      <!-- CONTENU -->
+      <!-- CONTENT -->
       <div>
         <!-- English (default) -->
         <div id="content-en">
