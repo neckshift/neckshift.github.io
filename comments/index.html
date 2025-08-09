@@ -14,92 +14,50 @@
       line-height: 1.8;
       font-size: 16px;
     }
-    .background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      overflow: hidden;
-    }
+    .background { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
     .background img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      filter: brightness(0.4);
-      pointer-events: none;
-      user-select: none;
+      width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4);
+      pointer-events: none; user-select: none;
     }
     .container {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
-      background-color: rgba(48, 48, 48, 0.6);
-      border-radius: 16px;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      text-align: left;
+      max-width: 800px; margin: 40px auto; padding: 20px;
+      background-color: rgba(48,48,48,0.6);
+      border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1); text-align: left;
     }
-    h2 { color: #AA9E9E; text-align: center; }
-    p.note { color: #AA9E9E; text-align: center; margin-top: -6px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .btn-small {
+      border:1px solid #888; color:#AA9E9E; background:none; border-radius:8px; padding:6px 10px; cursor:pointer;
+    }
+    .btn-small:hover { background:#555; color:#fff; }
+    h2 { color:#AA9E9E; margin: 8px 0; }
+    p.note { color:#AA9E9E; margin-top:-6px; text-align:center; }
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 10px;
-    }
+    form { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
     input, select, textarea {
       background: rgba(44,44,44,0.25);
       border: 1px solid rgba(255,255,255,0.25);
-      color: #eee;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 15px;
+      color: #eee; padding: 10px; border-radius: 8px; font-size: 15px;
     }
-    input::placeholder, textarea::placeholder { color: #bbb; }
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: rgba(255,255,255,0.45);
-      background: rgba(44,44,44,0.35);
-    }
+    input::placeholder, textarea::placeholder { color:#bbb; }
+    input:focus, select:focus, textarea:focus { outline:none; border-color: rgba(255,255,255,0.45); background: rgba(44,44,44,0.35); }
     button {
-      background: none;
-      color: #AA9E9E;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 16px;
-      border: 1px solid #888;
-      padding: 10px;
-      cursor: pointer;
+      background: none; color: #AA9E9E; border-radius: 8px; font-size: 16px; border: 1px solid #888; padding: 10px; cursor:pointer;
       transition: all 0.3s ease;
     }
-    button:hover { background-color: #555; color: #fff; }
-
-    .status {
-      min-height: 22px;
-      font-size: 14px;
-      color: #d9bebe;
-    }
+    button:hover { background:#555; color:#fff; }
+    .status { min-height:22px; font-size:14px; color:#d9bebe; }
 
     .comment {
-      background: rgba(44,44,44,0.40);
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 14px;
-      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(44,44,44,0.40); padding: 12px; border-radius: 10px; margin-top: 14px; border: 1px solid rgba(255,255,255,0.10);
+      position: relative;
     }
-    .comment strong { color: #fff; }
     .meta { font-size: 13px; color: #8f8f8f; margin-bottom: 6px; }
     .reply {
-      margin-top: 10px;
-      padding: 10px;
-      border-left: 3px solid #8aa;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
+      margin-top: 10px; padding: 10px; border-left: 3px solid #8aa; background: rgba(255,255,255,0.05); border-radius: 8px;
     }
+    .admin-actions { position:absolute; top:8px; right:8px; display:flex; gap:6px; }
+    .admin-actions button { padding:4px 8px; font-size:12px; border-radius:6px; }
   </style>
 </head>
 <body>
@@ -108,20 +66,15 @@
   </div>
 
   <div class="container">
-    <h2>Comments</h2>
+    <div class="topbar">
+      <h2 style="margin:0 auto 0 0; color:#AA9E9E;">Comments</h2>
+      <button id="adminToggle" class="btn-small" title="Enter admin token to moderate">Admin mode</button>
+    </div>
     <p class="note">Share thanks, ideas or bug reports.</p>
 
     <form id="commentForm" autocomplete="off" autocapitalize="off" autocorrect="off">
-      <input
-        type="text"
-        id="name"
-        name="ns-name"
-        placeholder="Your name (optional)"
-        maxlength="40"
-        autocomplete="off"
-        autocapitalize="off"
-        autocorrect="off"
-      >
+      <input type="text" id="name" name="ns-name" placeholder="Your name (optional)" maxlength="40"
+             autocomplete="off" autocapitalize="off" autocorrect="off">
       <select id="topic">
         <option value="thanks">Thanks</option>
         <option value="feature">Feature request</option>
@@ -147,14 +100,46 @@
 
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
-    const API = "https://neckshift-comments.brd-louu.workers.dev/comments"; // si tu changes de Worker, modifie ici
+    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
+    const API = API_BASE + "/comments";
+
+    // Admin token stocké uniquement en session locale du navigateur (le serveur vérifie vraiment)
+    let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
+    const isAdminActive = () => !!ADMIN_TOKEN;
+
     let turnstileReady = false;
     window.onTurnstileOk = function(){ turnstileReady = true; };
 
     function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
     function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
 
-    // Charge et affiche la liste
+    // Admin toggle
+    const adminBtn = document.getElementById("adminToggle");
+    function refreshAdminButton(){
+      adminBtn.textContent = isAdminActive() ? "Admin mode: ON" : "Admin mode";
+      adminBtn.style.color = isAdminActive() ? "#9fd" : "";
+    }
+    adminBtn.addEventListener("click", ()=>{
+      if (isAdminActive()) {
+        if (confirm("Disable admin mode?")) {
+          ADMIN_TOKEN = "";
+          sessionStorage.removeItem("ns_admin_token");
+          refreshAdminButton();
+          loadComments();
+        }
+        return;
+      }
+      const t = prompt("Enter admin token:");
+      if (t && t.trim()) {
+        ADMIN_TOKEN = t.trim();
+        sessionStorage.setItem("ns_admin_token", ADMIN_TOKEN);
+        refreshAdminButton();
+        loadComments();
+      }
+    });
+    refreshAdminButton();
+
+    // Rendu liste
     async function loadComments(){
       try{
         const r = await fetch(API);
@@ -165,27 +150,76 @@
           const when = new Date(c.created_at||Date.now()).toLocaleString();
           const el = document.createElement('div');
           el.className = 'comment';
-          el.innerHTML =
+          el.dataset.id = c.id;
+
+          let html =
             `<div class="meta">${escapeHtml(c.name || 'Anonymous')} • ${when} • ${escapeHtml(c.topic || 'other')}</div>` +
             `<div>${linkify(escapeHtml(c.message || ''))}</div>`;
-          // Affiche une éventuelle réponse du dev (si tu ajoutes la feature côté Worker)
+
           if (c.reply && c.reply.message) {
-            el.innerHTML += `<div class="reply"><strong>${escapeHtml(c.reply.by || 'Dev')}</strong><br>${linkify(escapeHtml(c.reply.message))}</div>`;
+            html += `<div class="reply"><strong>${escapeHtml(c.reply.by || 'Dev')}</strong><br>${linkify(escapeHtml(c.reply.message))}</div>`;
           }
+
+          // Boutons admin si mode actif
+          if (isAdminActive()) {
+            html += `<div class="admin-actions">
+                       <button class="btn-small" data-action="reply">Reply</button>
+                       <button class="btn-small" data-action="delete">Delete</button>
+                     </div>`;
+          }
+
+          el.innerHTML = html;
           list.appendChild(el);
         });
+
+        // Bind actions admin
+        if (isAdminActive()) {
+          document.querySelectorAll('.admin-actions button').forEach(btn=>{
+            btn.addEventListener('click', async (e)=>{
+              const action = btn.dataset.action;
+              const wrapper = btn.closest('.comment');
+              const id = wrapper?.dataset?.id;
+              if (!id) return;
+
+              if (action === 'delete') {
+                if (!confirm('Delete this comment?')) return;
+                const rr = await fetch(`${API}/${id}`, {
+                  method: "DELETE",
+                  headers: { "Authorization": `Bearer ${ADMIN_TOKEN}` }
+                });
+                if (!rr.ok) { alert('Delete failed'); return; }
+                loadComments();
+              }
+
+              if (action === 'reply') {
+                const text = prompt('Reply as "Anatomie Sonore":');
+                if (!text || !text.trim()) return;
+                const rr = await fetch(`${API}/${id}/reply`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":"application/json",
+                    "Authorization": `Bearer ${ADMIN_TOKEN}`
+                  },
+                  body: JSON.stringify({ reply: text.trim() })
+                });
+                if (!rr.ok) { alert('Reply failed'); return; }
+                loadComments();
+              }
+            });
+          });
+        }
       }catch(e){
         console.error(e);
       }
     }
 
-    // Submit
+    // Submit public
     document.getElementById('commentForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const statusEl = document.getElementById('status');
       statusEl.textContent = "";
 
-      // Demande à Turnstile de générer un token si besoin (mode invisible)
+      // Turnstile invisible → demander un token si besoin
       if (window.turnstile && !turnstile.getResponse()) {
         await new Promise(resolve => {
           const t = setInterval(() => {
@@ -200,14 +234,8 @@
       const topic = document.getElementById('topic').value;
       const message = document.getElementById('message').value.trim();
 
-      if (!message || message.length < 2) {
-        statusEl.textContent = "Message is too short.";
-        return;
-      }
-      if (!token) {
-        statusEl.textContent = "Please complete the verification.";
-        return;
-      }
+      if (!message || message.length < 2) { statusEl.textContent = "Message is too short."; return; }
+      if (!token) { statusEl.textContent = "Please complete the verification."; return; }
 
       try{
         const r = await fetch(API, {
