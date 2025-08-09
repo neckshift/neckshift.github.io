@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>NeckShift – Comments</title>
 <style>
-  :root{--fg:#E9E3E3;--muted:#B3A8A8;--line:rgba(255,255,255,.14);--bg:#121212;--glass:rgba(28,28,28,.65);--glass2:rgba(24,24,24,.85);--green:#6ef0a8;--devBubble:rgba(120,200,170,.10)}
+  :root{
+    --fg:#E9E3E3;--muted:#B3A8A8;--line:rgba(255,255,255,.14);
+    --bg:#121212;--glass:rgba(28,28,28,.65);--glass2:rgba(24,24,24,.85);
+    --green:#6ef0a8;--devBubble:rgba(120,200,170,.10);
+    --badge:#2a2a2a;--badgeText:#d6d6d6;
+  }
   *{box-sizing:border-box}
   body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);scrollbar-width:none}
   ::-webkit-scrollbar{width:0;height:0}
@@ -33,17 +38,40 @@
 
   .panel{margin-top:14px;background:var(--glass);border:1px solid var(--line);border-radius:16px}
   .list{padding:6px 12px}
-  .thread{padding:14px 10px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
+  .thread{border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
   .thread:nth-child(odd){background:rgba(0,0,0,.18)} /* alternance par fil */
-  .meta{font-size:13px;color:#b6b6b6;margin-bottom:6px}
-  .name{font-weight:600;color:#f0eded}.time{color:#9e9e9e;margin-left:8px}
-  .text{white-space:pre-wrap;line-height:1.6;color:#e9e3e3}
+
+  /* Header cliquable */
+  .thread-head{
+    display:flex;align-items:center;gap:10px;justify-content:space-between;
+    padding:14px 10px;cursor:pointer;
+  }
+  .meta{font-size:13px;color:#b6b6b6}
+  .name{font-weight:600;color:#f0eded}
+  .time{color:#9e9e9e;margin-left:8px}
+  .preview{color:#ddd;opacity:.9;margin-top:4px;max-width:70ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .count-badge{
+    margin-left:auto; background:var(--badge); color:var(--badgeText);
+    border:1px solid rgba(255,255,255,.2); border-radius:999px;
+    padding:4px 10px; font-size:12px;
+  }
+  .chev{margin-left:10px;opacity:.7;transition:.2s}
+  .thread.open .chev{transform:rotate(90deg);opacity:1}
+
+  /* Contenu du thread (caché par défaut) */
+  .thread-body{display:none;padding:0 10px 12px}
+  .thread.open .thread-body{display:block}
+  .text{white-space:pre-wrap;line-height:1.6;color:#e9e3e3;padding:0 2px}
+
   .dev-reply{margin-top:10px;margin-left:12px;padding:10px 12px;border-left:3px solid var(--green);background:var(--devBubble);border-radius:10px}
   .dev-reply .by{color:var(--green);font-weight:600;margin-right:6px}
   .user-follow{margin-top:8px;margin-left:12px;padding-left:12px;border-left:2px solid rgba(255,255,255,.15);color:#ddd}
-  .actions{display:flex;gap:6px;margin-top:8px}
+
+  .actions{display:flex;gap:6px;margin-top:10px}
   .inlinebox{display:none;margin-top:8px}
   .inlinebox textarea{width:100%;min-height:80px}
+  .inlinebox .row2{display:flex;gap:8px;align-items:center;margin-top:6px}
+  .inlinebox input[type="text"]{width:220px}
 </style>
 </head>
 <body>
@@ -101,10 +129,14 @@
   const OWNER_TOKEN = localStorage.getItem(OWNER_TOKEN_KEY);
   const OWNED_KEY = "ns_owned_ids";
 
+  // Remember last used display name for follow-ups
+  const NAME_STORE_KEY = "ns_display_name";
+
   // UI helpers
   function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
   function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
   function fmtDate(s){ try{ return new Date(s||Date.now()).toLocaleString(); }catch{ return ""; } }
+  function snippet(s){ s = String(s||""); return s.length>140 ? s.slice(0,140)+"…" : s; }
 
   // Tabs
   let currentTopic = "thanks";
@@ -171,6 +203,7 @@
         return;
       }
       document.getElementById('message').value = "";
+      if (name) localStorage.setItem(NAME_STORE_KEY, name);
 
       // remember ownership
       const arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]");
@@ -192,79 +225,104 @@
 
       data.forEach(c=>{
         const wrap = document.createElement('div');
-        wrap.className = 'thread';
+        wrap.className = 'thread'; // fermé par défaut
         wrap.dataset.id = c.id;
 
-        let html =
-          `<div class="meta">
-             <span class="name">${escapeHtml(c.name || 'Anonymous')}</span>
-             <span class="time">${fmtDate(c.created_at)}</span>
-           </div>
-           <div class="text">${linkify(escapeHtml(c.message || ''))}</div>`;
-
-        // thread entries (dev + user follow-ups)
+        // thread entries
         const t = Array.isArray(c.thread) ? c.thread : [];
-        t.forEach(entry=>{
-          if (entry.by === 'dev') {
-            html += `<div class="dev-reply"><span class="by">Anatomie Sonore</span> ${linkify(escapeHtml(entry.message||''))}</div>`;
-          } else {
-            html += `<div class="user-follow"><span class="name">${escapeHtml(entry.name||'Anonymous')}</span> — ${linkify(escapeHtml(entry.message||''))}</div>`;
-          }
-        });
+        const totalCount = 1 + t.length; // 1 = message initial
 
-        // bouton "Reply to dev" seulement s'il existe AU MOINS une réponse dev dans ce fil
+        // header (cliquable pour ouvrir/fermer)
+        const head = document.createElement('div');
+        head.className = 'thread-head';
+        head.innerHTML = `
+          <div>
+            <div class="meta"><span class="name">${escapeHtml(c.name || 'Anonymous')}</span><span class="time">${fmtDate(c.created_at)}</span></div>
+            <div class="preview">${escapeHtml(snippet(c.message||''))}</div>
+          </div>
+          <div class="count-badge" title="${totalCount} messages in this thread">${totalCount}</div>
+          <div class="chev">▶</div>
+        `;
+        wrap.appendChild(head);
+
+        // body (détails du fil)
+        const body = document.createElement('div');
+        body.className = 'thread-body';
+        body.innerHTML = `
+          <div class="text">${linkify(escapeHtml(c.message || ''))}</div>
+          ${t.map(entry => entry.by === 'dev'
+            ? `<div class="dev-reply"><span class="by">Anatomie Sonore</span> ${linkify(escapeHtml(entry.message||''))}</div>`
+            : `<div class="user-follow"><span class="name">${escapeHtml(entry.name||'Anonymous')}</span> — ${linkify(escapeHtml(entry.message||''))}</div>`
+          ).join('')}
+        `;
+        wrap.appendChild(body);
+
+        // logique: bouton "Reply to dev" uniquement s'il existe au moins une réponse dev
         const hasDevReply = t.some(e => e.by === 'dev');
 
         // actions
+        let actionsHTML = `<div class="actions">`;
         if (isAdmin()) {
-          html += `<div class="actions">
-                     <button class="btn-small" data-action="reply">Reply</button>
-                     <button class="btn-small" data-action="delete">Delete</button>
-                   </div>
-                   <div class="inlinebox">
-                     <textarea placeholder="Write a dev reply…"></textarea>
-                     <div class="actions">
-                       <button class="btn-small" data-action="send-reply">Send</button>
-                       <button class="btn-small" data-action="cancel-reply">Cancel</button>
-                     </div>
-                   </div>`;
+          actionsHTML += `<button class="btn-small" data-action="reply">Reply</button>
+                          <button class="btn-small" data-action="delete">Delete</button>`;
         } else {
-          let visitorActions = `<div class="actions">`;
-          if (hasDevReply) {
-            visitorActions += `<button class="btn-small" data-action="reply-to-dev">Reply to dev</button>`;
-          }
+          if (hasDevReply) actionsHTML += `<button class="btn-small" data-action="reply-to-dev">Reply to dev</button>`;
           if (owned.includes(c.id)) {
-            visitorActions += `<button class="btn-small" data-action="edit">Edit</button>
-                               <button class="btn-small" data-action="del">Delete</button>`;
-          }
-          visitorActions += `</div>`;
-          html += visitorActions;
-
-          if (hasDevReply) {
-            html += `<div class="inlinebox">
-                       <textarea placeholder="Write your reply to dev…"></textarea>
-                       <div class="actions">
-                         <button class="btn-small" data-action="send-user">Send</button>
-                         <button class="btn-small" data-action="cancel-user">Cancel</button>
-                       </div>
-                     </div>`;
+            actionsHTML += `<button class="btn-small" data-action="edit">Edit</button>
+                            <button class="btn-small" data-action="del">Delete</button>`;
           }
         }
+        actionsHTML += `</div>`;
+        const actions = document.createElement('div');
+        actions.innerHTML = actionsHTML;
+        body.appendChild(actions);
 
-        wrap.innerHTML = html;
+        // inline boxes
+        if (isAdmin()) {
+          const ib = document.createElement('div');
+          ib.className = 'inlinebox';
+          ib.innerHTML = `
+            <textarea placeholder="Write a dev reply…"></textarea>
+            <div class="actions">
+              <button class="btn-small" data-action="send-reply">Send</button>
+              <button class="btn-small" data-action="cancel-reply">Cancel</button>
+            </div>`;
+          body.appendChild(ib);
+        } else if (hasDevReply) {
+          const ib = document.createElement('div');
+          ib.className = 'inlinebox';
+          const presetName = (localStorage.getItem(NAME_STORE_KEY) || document.getElementById('name').value || "").trim().slice(0,40);
+          ib.innerHTML = `
+            <textarea placeholder="Write your reply to dev…"></textarea>
+            <div class="row2">
+              <input type="text" class="reply-name" placeholder="Your name" value="${escapeHtml(presetName)}" maxlength="40">
+              <button class="btn-small" data-action="send-user">Send</button>
+              <button class="btn-small" data-action="cancel-user">Cancel</button>
+            </div>`;
+          body.appendChild(ib);
+        }
+
+        // append to list
         list.appendChild(wrap);
 
-        // wire
+        // interactions
+        head.addEventListener('click', ()=>{
+          wrap.classList.toggle('open');
+        });
+
         if (isAdmin()) {
-          const box = wrap.querySelector('.inlinebox');
-          const ta  = box?.querySelector('textarea');
-          wrap.querySelector('[data-action="reply"]')?.addEventListener('click', ()=>{
-            box.style.display='block'; ta.value=""; ta.focus();
+          const ib = body.querySelector('.inlinebox');
+          const ta = ib?.querySelector('textarea');
+          body.querySelector('[data-action="reply"]')?.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            ib.style.display='block'; ta.value=""; ta.focus();
           });
-          wrap.querySelector('[data-action="cancel-reply"]')?.addEventListener('click', ()=>{
-            box.style.display='none'; ta.value="";
+          body.querySelector('[data-action="cancel-reply"]')?.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            ib.style.display='none'; ta.value="";
           });
-          wrap.querySelector('[data-action="send-reply"]')?.addEventListener('click', async ()=>{
+          body.querySelector('[data-action="send-reply"]')?.addEventListener('click', async (e)=>{
+            e.stopPropagation();
             const text = (ta.value||"").trim(); if (!text) return;
             const rr = await fetch(`${API}/${c.id}/reply`, {
               method:"POST",
@@ -274,7 +332,8 @@
             if (!rr.ok){ alert("Reply failed"); return; }
             loadComments();
           });
-          wrap.querySelector('[data-action="delete"]')?.addEventListener('click', async ()=>{
+          body.querySelector('[data-action="delete"]')?.addEventListener('click', async (e)=>{
+            e.stopPropagation();
             if (!confirm('Delete this thread?')) return;
             const rr = await fetch(`${API}/${c.id}`, {
               method:"DELETE",
@@ -284,32 +343,34 @@
             loadComments();
           });
         } else {
-          const box = wrap.querySelector('.inlinebox');
-          const ta  = box?.querySelector('textarea');
+          const ib = body.querySelector('.inlinebox');
+          const ta = ib?.querySelector('textarea');
+          const nameInput = ib?.querySelector('.reply-name');
 
-          // OUVRIR/CLOSE la zone
-          wrap.querySelector('[data-action="reply-to-dev"]')?.addEventListener('click', ()=>{
-            if (!box) return;
-            box.style.display='block'; ta.value=""; ta.focus();
+          body.querySelector('[data-action="reply-to-dev"]')?.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            if (!ib) return;
+            ib.style.display='block'; ta.value=""; (nameInput && nameInput.focus());
           });
-          wrap.querySelector('[data-action="cancel-user"]')?.addEventListener('click', ()=>{
-            if (!box) return;
-            box.style.display='none'; ta.value="";
+          body.querySelector('[data-action="cancel-user"]')?.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            if (!ib) return;
+            ib.style.display='none'; ta.value="";
           });
 
-          // 👉👉👉 Handler "Send" avec affichage des erreurs détaillées
-          wrap.querySelector('[data-action="send-user"]')?.addEventListener('click', async ()=>{
-            if (!box) return;
-            const text = (ta.value||"").trim(); if (!text) return;
+          // SEND avec gestion d'erreur détaillée + stockage du nom
+          body.querySelector('[data-action="send-user"]')?.addEventListener('click', async (e)=>{
+            e.stopPropagation();
+            if (!ib) return;
+            const text = (ta.value||"").trim();
+            const dispName = (nameInput?.value || "").trim().slice(0,40) || "Anonymous";
+            if (!text) return;
 
             try{
               const rr = await fetch(`${API}/${c.id}/followup`, {
                 method:"POST",
                 headers:{ "Content-Type":"application/json" },
-                body: JSON.stringify({
-                  name: document.getElementById('name').value.trim().slice(0,40),
-                  message: text
-                })
+                body: JSON.stringify({ name: dispName, message: text })
               });
 
               let resp = {};
@@ -322,17 +383,19 @@
               }
 
               // succès
-              box.style.display='none';
+              localStorage.setItem(NAME_STORE_KEY, dispName);
+              ib.style.display='none';
               ta.value="";
               loadComments();
-            }catch(e){
+            }catch(err){
               alert("Network error");
-              console.error(e);
+              console.error(err);
             }
           });
 
-          // owner edit/del (pour le fil de tête)
-          wrap.querySelector('[data-action="del"]')?.addEventListener('click', async ()=>{
+          // owner edit/del (fil de tête)
+          body.querySelector('[data-action="del"]')?.addEventListener('click', async (e)=>{
+            e.stopPropagation();
             if (!confirm('Delete your thread?')) return;
             const rr = await fetch(`${API}/${c.id}`, {
               method:"DELETE",
@@ -343,7 +406,8 @@
             localStorage.setItem(OWNED_KEY, JSON.stringify(arr));
             loadComments();
           });
-          wrap.querySelector('[data-action="edit"]')?.addEventListener('click', async ()=>{
+          body.querySelector('[data-action="edit"]')?.addEventListener('click', async (e)=>{
+            e.stopPropagation();
             const cur = prompt("Edit your message:", c.message||"");
             if (cur==null) return;
             const txt = String(cur).trim(); if (!txt) return;
@@ -369,6 +433,9 @@
         if (!ok) { ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token"); refreshAdminUI(); }
       } catch {}
     }
+    // préremplir le champ name du formulaire avec la dernière valeur connue
+    const lastName = localStorage.getItem("ns_display_name");
+    if (lastName) document.getElementById('name').value = lastName;
     loadComments();
   })();
 </script>
