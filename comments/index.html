@@ -25,13 +25,18 @@
       border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255,255,255,0.1); text-align: left;
     }
-    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .topbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:8px; }
     .btn-small {
       border:1px solid #888; color:#AA9E9E; background:none; border-radius:8px; padding:6px 10px; cursor:pointer;
     }
     .btn-small:hover { background:#555; color:#fff; }
     h2 { color:#AA9E9E; margin: 8px 0; }
     p.note { color:#AA9E9E; margin-top:-6px; text-align:center; }
+
+    #adminPanel { display:none; gap:8px; align-items:center; }
+    #adminPanel input {
+      background:#2c2c2c; color:#ddd; border:1px solid #888; border-radius:8px; padding:6px 8px;
+    }
 
     form { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
     input, select, textarea {
@@ -67,9 +72,19 @@
 
   <div class="container">
     <div class="topbar">
-      <h2 style="margin:0 auto 0 0; color:#AA9E9E;">Comments</h2>
-      <button id="adminToggle" class="btn-small" title="Enter admin token to moderate">Admin mode</button>
+      <h2 style="margin:0; color:#AA9E9E;">Comments</h2>
+
+      <!-- Bouton + panneau admin (password masqué) -->
+      <div style="display:flex; gap:10px; align-items:center; margin-left:auto;">
+        <button id="adminToggle" class="btn-small" title="Enter admin password to moderate">Admin mode</button>
+        <div id="adminPanel">
+          <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off">
+          <button id="adminUse" class="btn-small">Use</button>
+          <button id="adminCancel" class="btn-small">Cancel</button>
+        </div>
+      </div>
     </div>
+
     <p class="note">Share thanks, ideas or bug reports.</p>
 
     <form id="commentForm" autocomplete="off" autocapitalize="off" autocorrect="off">
@@ -103,22 +118,30 @@
     const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
     const API = API_BASE + "/comments";
 
-    // Admin token stocké uniquement en session locale du navigateur (le serveur vérifie vraiment)
+    // Admin token stocké uniquement en session de l’onglet
     let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
     const isAdminActive = () => !!ADMIN_TOKEN;
 
+    // Turnstile invisible
     let turnstileReady = false;
     window.onTurnstileOk = function(){ turnstileReady = true; };
 
     function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
     function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
 
-    // Admin toggle
-    const adminBtn = document.getElementById("adminToggle");
+    // ----- Admin panel (password masked)
+    const adminBtn   = document.getElementById("adminToggle");
+    const adminPanel = document.getElementById("adminPanel");
+    const adminPwd   = document.getElementById("adminPassword");
+    const adminUse   = document.getElementById("adminUse");
+    const adminCancel= document.getElementById("adminCancel");
+
     function refreshAdminButton(){
       adminBtn.textContent = isAdminActive() ? "Admin mode: ON" : "Admin mode";
       adminBtn.style.color = isAdminActive() ? "#9fd" : "";
+      adminPanel.style.display = "none"; // refermer le panneau
     }
+
     adminBtn.addEventListener("click", ()=>{
       if (isAdminActive()) {
         if (confirm("Disable admin mode?")) {
@@ -127,19 +150,30 @@
           refreshAdminButton();
           loadComments();
         }
-        return;
-      }
-      const t = prompt("Enter admin token:");
-      if (t && t.trim()) {
-        ADMIN_TOKEN = t.trim();
-        sessionStorage.setItem("ns_admin_token", ADMIN_TOKEN);
-        refreshAdminButton();
-        loadComments();
+      } else {
+        adminPanel.style.display = "flex";
+        adminPwd.value = "";
+        adminPwd.focus();
       }
     });
+
+    adminUse.addEventListener("click", ()=>{
+      const t = adminPwd.value.trim();
+      if (!t) return;
+      ADMIN_TOKEN = t;
+      sessionStorage.setItem("ns_admin_token", ADMIN_TOKEN);
+      refreshAdminButton();
+      loadComments();
+    });
+
+    adminCancel.addEventListener("click", ()=>{
+      adminPanel.style.display = "none";
+      adminPwd.value = "";
+    });
+
     refreshAdminButton();
 
-    // Rendu liste
+    // ----- Liste des commentaires
     async function loadComments(){
       try{
         const r = await fetch(API);
@@ -160,7 +194,6 @@
             html += `<div class="reply"><strong>${escapeHtml(c.reply.by || 'Dev')}</strong><br>${linkify(escapeHtml(c.reply.message))}</div>`;
           }
 
-          // Boutons admin si mode actif
           if (isAdminActive()) {
             html += `<div class="admin-actions">
                        <button class="btn-small" data-action="reply">Reply</button>
@@ -172,7 +205,6 @@
           list.appendChild(el);
         });
 
-        // Bind actions admin
         if (isAdminActive()) {
           document.querySelectorAll('.admin-actions button').forEach(btn=>{
             btn.addEventListener('click', async (e)=>{
@@ -213,13 +245,12 @@
       }
     }
 
-    // Submit public
+    // ----- Submit public
     document.getElementById('commentForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const statusEl = document.getElementById('status');
       statusEl.textContent = "";
 
-      // Turnstile invisible → demander un token si besoin
       if (window.turnstile && !turnstile.getResponse()) {
         await new Promise(resolve => {
           const t = setInterval(() => {
