@@ -22,8 +22,11 @@
       --card: rgba(48,48,48,0.6);
       --border: rgba(255,255,255,0.1);
       --btn-border:#888;
-      --btn-bg:#2b2b2b;
-      --btn-bg-hover:#3a3a3a;
+      --btn-bg-r:43;  /* 2b */
+      --btn-bg-g:43;
+      --btn-bg-b:43;
+      --btn-bg-alpha:0.30;    /* 30% de fond */
+      --btn-bg-hover-alpha:0.60;
       --btn-text:#e9e9e9;
     }
 
@@ -64,53 +67,54 @@
       color: var(--muted);
     }
 
-    /* Download buttons – full-width like paragraphs, transparent base */
+    /* Boutons de téléchargement – largeur de la bulle, fond transparent 30% */
     .download-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      width: 100%;
-      max-width: 80ch;           /* aligné avec la largeur des paragraphes */
+      width: 100%;               /* pleine largeur de la bulle */
       height: 70px;
-      background: var(--btn-bg);
-      color: var(--btn-text);
-      opacity: 0.3;              /* 30% d’opacité au repos */
+      background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha));
+      color: var(--btn-text);    /* texte 100% opaque */
       text-decoration: none;
       border-radius: 12px;
       text-align: center;
       font-size: 18px;
       border: 1.5px solid var(--btn-border);
-      transition: transform .08s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
       cursor: pointer;
       font-weight: 600;
       letter-spacing: .2px;
     }
     .download-button:hover {
-      background: var(--btn-bg-hover);
+      background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha));
       border-color: #9a9a9a;
-      opacity: 1;                /* opaque au survol */
       transform: translateY(-1px);
     }
     .download-button .sub {
       display:block;
       font-size:12px;
-      opacity:.8;
+      opacity:.9;
       font-weight:500;
       letter-spacing:.3px;
       line-height:1;
     }
     .download-button svg{
-      width:22px;height:22px;flex:none;opacity:.9;
+      width:22px;height:22px;flex:none;opacity:1;
     }
 
-    /* Menu line (Comments + Ko-Fi + Language) */
+    /* Barre de menu – largeur de la bulle */
+    .menu-bar-wrap{
+      width: 100%;
+    }
     .menu-bar {
+      width: 100%;               /* occupe la largeur de la bulle */
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 16px;
-      margin: 10px 0 0;
+      margin: 0;                 /* serré au liseret qu’on place dessous */
       flex-wrap: wrap;
     }
     .menu-button, .kofi-button {
@@ -208,12 +212,12 @@
   </div>
 
   <div class="section">
-    <div style="background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 40px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);">
+    <div style="background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 32px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);">
       
-      <!-- Top / Hero -->
-      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px; flex-wrap: wrap;">
+      <!-- Top / Hero (boutons = largeur bulle) -->
+      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 40px; flex-wrap: wrap; width:100%;">
         <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888;">
-        <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 20px; align-items: center; flex: 1;">
+        <div class="download-button-wrapper" style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
           <!-- Windows -->
           <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShiftSetup.exe" class="download-button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
@@ -233,25 +237,24 @@
         </div>
       </div>
 
-      <!-- Separator moved JUST BELOW the download buttons -->
-      <hr style="border: none; border-top: 1px solid var(--line); margin: 24px 0 8px;">
-
-      <!-- MENU LINE (still before the title) -->
-      <div class="menu-bar">
-        <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
-        <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
-        <div class="lang-switch" aria-label="Language">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2m7.93 8h-3.18a15.7 15.7 0 00-1.2-5A8.021 8.021 0 0119.93 10M12 4a13.7 13.7 0 011.77 6H10.23A13.7 13.7 0 0112 4M4.07 10A8.021 8.021 0 0110.38 5a15.7 15.7 0 00-1.2 5H4.07m0 4h3.18a15.7 15.7 0 001.2 5A8.021 8.021 0 014.07 14M12 20a13.7 13.7 0 01-1.77-6h3.54A13.7 13.7 0 0112 20m1.62-.38a15.7 15.7 0 001.2-5h3.18a8.021 8.021 0 01-4.38 5M7 14a13.7 13.7 0 01-.23-2c0-.68.08-1.34.23-2h10a13.7 13.7 0 01.23 2 13.7 13.7 0 01-.23 2z"/></svg>
-          <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
-          <button type="button" id="btn-fr" onclick="setLang('fr')">Français</button>
+      <!-- MENU (au-dessus du liseret) -->
+      <div class="menu-bar-wrap">
+        <div class="menu-bar">
+          <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
+          <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
+          <div class="lang-switch" aria-label="Language">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2m7.93 8h-3.18a15.7 15.7 0 00-1.2-5A8.021 8.021 0 0119.93 10M12 4a13.7 13.7 0 011.77 6H10.23A13.7 13.7 0 0112 4M4.07 10A8.021 8.021 0 0110.38 5a15.7 15.7 0 00-1.2 5H4.07m0 4h3.18a15.7 15.7 0 001.2 5A8.021 8.021 0 014.07 14M12 20a13.7 13.7 0 01-1.77-6h3.54A13.7 13.7 0 0112 20m1.62-.38a15.7 15.7 0 001.2-5h3.18a8.021 8.021 0 01-4.38 5M7 14a13.7 13.7 0 01-.23-2c0-.68.08-1.34.23-2h10a13.7 13.7 0 01.23 2 13.7 13.7 0 01-.23 2z"/></svg>
+            <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
+            <button type="button" id="btn-fr" onclick="setLang('fr')">Français</button>
+          </div>
         </div>
+        <!-- Liseret immédiatement sous le menu (proche) -->
+        <hr style="border:none; border-top:1px solid var(--line); margin: 8px 0 0;">
       </div>
 
-      <!-- CONTENT -->
+      <!-- CONTENU -->
       <div>
-        <!-- plus de HR ici, le liseret est désormais au-dessus du menu -->
-
-        <!-- English content (default) -->
+        <!-- English (default) -->
         <div id="content-en">
           <h2 class="section-title"><em>What is NeckShift?</em></h2>
           <p>NeckShift is a free software designed to explore the fretboard through selections of notes and related scales — interactively.</p>
@@ -276,7 +279,7 @@
           <p>It now feels stable, clear, and useful enough to share. Please send feedback, suggestions, or report any issues on the comments page.</p>
         </div>
 
-        <!-- French content (original) -->
+        <!-- Français (original) -->
         <div id="content-fr" style="display:none;">
           <h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
           <p>NeckShift est un logiciel gratuit conçu pour explorer le manche via des selections de notes et de gammes associées, le tout de façon interactive.</p>
