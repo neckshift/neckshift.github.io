@@ -1,487 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NeckShift – Comments</title>
+<meta charset="UTF-8">
+<title>Comments</title>
 <style>
-  :root{
-    --fg:#E9E3E3;--muted:#B3A8A8;--line:rgba(255,255,255,.14);
-    --bg:#121212;--glass:rgba(28,28,28,.65);--glass2:rgba(24,24,24,.85);
-    --green:#6ef0a8;--blue:#7fb7ff;--red:#ff8c8c;
-    --devBubble:#153a2b; --userBubble:#262626;
-    --badge:#2a2a2a;--badgeText:#d6d6d6;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg);scrollbar-width:none}
-  ::-webkit-scrollbar{width:0;height:0}
-  .background{position:fixed;inset:0;z-index:-1;overflow:hidden}
-  .background img{width:100%;height:100%;object-fit:cover;filter:brightness(.28)}
-  .wrap{max-width:920px;margin:28px auto;padding:0 16px}
+:root {
+  --userBubble: rgba(255,255,255,.08);
+  --devBubble: rgba(0,200,120,.15);
+}
 
-  /* Sticky uniquement pour l'entête + onglets */
-  .sticky{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:var(--glass2);border:1px solid var(--line);border-radius:16px}
-  .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
-  h2{margin:0;font-size:20px;color:#e8dfdf;font-weight:600}
-  .btn,.btn-small{border:1px solid rgba(255,255,255,.3);background:none;color:var(--muted);border-radius:8px;cursor:pointer;transition:.2s}
-  .btn{padding:10px 12px;font-size:15px}.btn-small{padding:6px 9px;font-size:13px}
-  .btn:hover{background:#3d3d3d;color:#fff}
-  #adminPanel{display:none;gap:8px;align-items:center}
-  #adminPanel input{background:transparent;border:1px solid rgba(255,255,255,.25);color:#eee;border-radius:8px;padding:7px 9px}
+body {
+  font-family: sans-serif;
+  background: #0d0d0d;
+  color: white;
+  margin: 0;
+  padding: 0;
+}
 
-  .tabs{display:flex;gap:8px;padding:10px 12px;flex-wrap:wrap}
-  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--line);color:#cfc7c7;cursor:pointer;background:rgba(255,255,255,.02)}
-  .tab[data-topic="thanks"].active{color:#111;background:var(--green);border-color:var(--green)}
-  .tab[data-topic="feature"].active{color:#111;background:var(--blue);border-color:var(--blue)}
-  .tab[data-topic="bug"].active{color:#111;background:var(--red);border-color:var(--red)}
+/* Barre des topics */
+#topics {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: #1a1a1a;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+#topics button {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #333;
+  color: white;
+}
+#topics button.active[data-topic="thanks"] { background: #28a745; }
+#topics button.active[data-topic="feature"] { background: #007bff; }
+#topics button.active[data-topic="bug"] { background: #dc3545; }
 
-  .panel{margin-top:14px;background:var(--glass);border:1px solid var(--line);border-radius:16px}
-  .form{padding:12px;border-bottom:1px solid var(--line)}
-  .row{display:grid;grid-template-columns:1fr;gap:10px}
-  input[type="text"],textarea{background:rgba(44,44,44,.35);border:1px solid rgba(255,255,255,.25);color:#eee;padding:10px 12px;border-radius:10px;font-size:15px}
-  textarea{width:100%;min-height:100px;resize:vertical}
-  .post-btn{margin-top:4px}
-  .list{padding:6px 12px}
+/* Formulaire */
+#form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+}
+#form input, #form textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+#form button {
+  padding: 8px;
+  border: none;
+  border-radius: 6px;
+  background: #28a745;
+  color: white;
+  cursor: pointer;
+}
 
-  .thread{border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
-  .thread:nth-child(odd){background:rgba(0,0,0,.18)}
+/* Messages */
+.thread {
+  border-bottom: 1px solid rgba(255,255,255,.1);
+  padding: 8px;
+}
+.thread-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.thread-header .meta {
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+.thread-header .actions button {
+  margin-left: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+}
 
-  .thread-head{
-    display:flex;align-items:center;gap:10px;justify-content:space-between;
-    padding:14px 10px;
-  }
-  .thread-head.clickable{cursor:pointer}
-  .meta{font-size:13px;color:#b6b6b6}
-  .name{font-weight:600;color:#f0eded;font-style:italic;font-size:1.06rem}
-  .time{color:#9e9e9e;margin-left:8px}
-  .preview{color:#ddd;opacity:.9;margin-top:4px;max-width:70ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .count-badge{
-    margin-left:auto; background:var(--badge); color:var(--badgeText);
-    border:1px solid rgba(255,255,255,.2); border-radius:999px;
-    padding:3px 10px; font-size:12px; white-space:nowrap;
-  }
-  .chev{margin-left:10px;opacity:.7;transition:.2s}
-  .thread.open .chev{transform:rotate(90deg);opacity:1}
+.bubble-row {
+  display: flex;
+  width: 100%;
+  margin-top: 8px;
+}
+.bubble-row.user { justify-content: flex-start; }
+.bubble-row.dev { justify-content: flex-end; }
 
-  .thread-body{display:none;padding:0 10px 12px}
-  .thread.open .thread-body{display:block}
+.bubble {
+  width: 78%;
+  padding: 8px 10px;
+  border-radius: 14px;
+  line-height: 1.4;
+  font-size: 15px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.06) inset;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+.bubble.user { background: var(--userBubble); }
+.bubble.dev {
+  background: var(--devBubble);
+  border: 1px solid rgba(110,240,168,.25);
+}
 
-  /* Bulles “SMS” partout, largeur fixe ~78% */
-  .bubble-row{display:flex;width:100%;margin-top:8px}
-  .bubble-row.user{justify-content:flex-start}
-  .bubble-row.dev{justify-content:flex-end}
-  .bubble{
-    width:78%;
-    padding:8px 10px;
-    border-radius:14px;
-    line-height:1.4;
-    font-size:15px;
-    box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
-    word-wrap:break-word;overflow-wrap:anywhere;
-  }
-  .bubble.user{background:var(--userBubble)}
-  .bubble.dev{background:var(--devBubble);border:1px solid rgba(110,240,168,.25)}
-  .who{display:block;margin-bottom:3px;font-style:italic;font-size:1.04rem;opacity:.95}
-
-  .actions{display:flex;gap:6px;margin-top:10px}
-  .inlinebox{display:none;margin-top:8px}
-  .inlinebox textarea{width:100%;min-height:72px}
-  .inlinebox .row2{display:flex;gap:8px;align-items:center;margin-top:6px}
-  .inlinebox input[type="text"]{width:200px}
+.who {
+  display: block;
+  margin-bottom: 3px;
+  font-style: italic;
+  font-size: 1.04rem;
+  opacity: .95;
+}
 </style>
 </head>
 <body>
-  <div class="background"><img src="../createbackground.png" alt=""></div>
 
-  <div class="wrap">
-    <!-- STICKY: header + tabs -->
-    <div class="sticky">
-      <div class="head">
-        <h2>Comments</h2>
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button id="adminToggle" class="btn-small" title="Enter admin password">Admin mode</button>
-          <div id="adminPanel">
-            <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
-            <button id="adminUse" class="btn-small">Use</button>
-            <button id="adminCancel" class="btn-small">Cancel</button>
-          </div>
-        </div>
-      </div>
+<div id="topics">
+  <button data-topic="thanks" class="active">Thanks</button>
+  <button data-topic="feature">Feature request</button>
+  <button data-topic="bug">Bug report</button>
+</div>
 
-      <div class="tabs">
-        <button class="tab active" data-topic="thanks">Thanks</button>
-        <button class="tab" data-topic="feature">Feature request</button>
-        <button class="tab" data-topic="bug">Bug report</button>
-      </div>
-    </div>
+<div id="form">
+  <input id="name" placeholder="Name">
+  <textarea id="message" placeholder="Write your comment..."></textarea>
+  <button id="post">Post</button>
+</div>
 
-    <!-- NON-sticky : le panel (form + liste) défile avec les messages -->
-    <div class="panel">
-      <div class="form">
-        <div class="row">
-          <input type="text" id="name" placeholder="Your name (optional)" maxlength="40">
-          <textarea id="message" placeholder="Write your comment..." maxlength="1500" required></textarea>
-          <button id="postBtn" class="btn post-btn">Post comment</button>
-          <div id="status" style="margin-top:6px;font-size:14px;color:#d9bebe"></div>
-        </div>
-      </div>
-
-      <div id="list" class="list"></div>
-    </div>
-  </div>
+<div id="comments"></div>
 
 <script>
-  const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
-  const API = API_BASE + "/comments";
+const API = "https://neckshift-comments.brd-louu.workers.dev";
+let currentTopic = "thanks";
+let isAdmin = false;
+let adminToken = "";
 
-  // --- Admin session
-  var ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
-  function isAdmin(){ return !!ADMIN_TOKEN; }
-
-  // --- Owner / display name
-  var OWNER_TOKEN_KEY = "ns_owner_token";
-  if (!localStorage.getItem(OWNER_TOKEN_KEY)) {
-    var arr = new Uint8Array(16);
-    crypto.getRandomValues(arr);
-    var t = ""; for (var i=0;i<arr.length;i++){ t += ("0"+arr[i].toString(16)).slice(-2); }
-    localStorage.setItem(OWNER_TOKEN_KEY, t);
-  }
-  var OWNER_TOKEN = localStorage.getItem(OWNER_TOKEN_KEY);
-  var OWNED_KEY = "ns_owned_ids";
-  var NAME_STORE_KEY = "ns_display_name";
-
-  function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, function(m){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]);});}
-  function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
-  function fmtDate(s){ try{ return new Date(s||Date.now()).toLocaleString(); }catch(e){ return ""; } }
-  function snippet(s){ s = String(s||""); return s.length>140 ? s.slice(0,140)+"…" : s; }
-
-  // --- Tabs
-  var currentTopic = "thanks";
-  var tabEls = document.querySelectorAll(".tab");
-  for (var i=0;i<tabEls.length;i++){
-    tabEls[i].addEventListener("click", (function(btn){
-      return function(){
-        for (var j=0;j<tabEls.length;j++) tabEls[j].classList.remove("active");
-        btn.classList.add("active");
-        currentTopic = btn.getAttribute("data-topic");
-        loadComments();
-        document.querySelector('.panel').scrollIntoView({ behavior:'smooth', block:'start' });
-      };
-    })(tabEls[i]));
-  }
-
-  // --- Admin UI
-  var adminBtn=document.getElementById("adminToggle");
-  var adminPanel=document.getElementById("adminPanel");
-  var adminPwd=document.getElementById("adminPassword");
-  var adminUse=document.getElementById("adminUse");
-  var adminCancel=document.getElementById("adminCancel");
-
-  function refreshAdminUI(){
-    adminBtn.textContent = isAdmin() ? "Admin mode: ON" : "Admin mode";
-    adminBtn.style.color = isAdmin() ? "#9fd" : "";
-    adminPanel.style.display="none";
-  }
-  adminBtn.addEventListener("click", function(){
-    if (isAdmin()) {
-      if (confirm("Disable admin mode?")) {
-        ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token");
-        refreshAdminUI(); loadComments();
-      }
-    } else { adminPanel.style.display="flex"; adminPwd.value=""; adminPwd.focus(); }
-  });
-  adminUse.addEventListener("click", function(){
-    var t = adminPwd.value.trim(); if (!t) return;
-    fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer "+t } })
-      .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
-      .then(function(x){
-        if (!x.ok || !x.j.ok) { alert("Wrong password"); return; }
-        ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
-        refreshAdminUI(); loadComments();
-      }).catch(function(){ alert("Network error"); });
-  });
-  adminCancel.addEventListener("click", function(){ adminPanel.style.display="none"; adminPwd.value=""; });
-  refreshAdminUI();
-
-  // --- Post top-level
-  document.getElementById("postBtn").addEventListener("click", function(){
-    var statusEl = document.getElementById('status');
-    statusEl.textContent = "";
-    var name = (document.getElementById('name').value||"").trim().slice(0,40);
-    var message = (document.getElementById('message').value||"").trim();
-    if (!message || message.length < 2) { statusEl.textContent = "Message is too short."; return; }
-
-    fetch(API, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ name:name, topic: currentTopic, message: message, owner: OWNER_TOKEN })
-    }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
-     .then(function(x){
-        if (!x.ok) {
-          statusEl.textContent = (x.j && x.j.error==='rate_limited') ? "Please wait a minute before posting again." : (x.j && x.j.error) || "Sorry, something went wrong.";
-          return;
-        }
-        document.getElementById('message').value = "";
-        if (name) localStorage.setItem(NAME_STORE_KEY, name);
-
-        var owned = []; try { owned = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]"); } catch(e){}
-        if (owned.indexOf(x.j.id)===-1) { owned.push(x.j.id); localStorage.setItem(OWNED_KEY, JSON.stringify(owned)); }
-        loadComments();
-     }).catch(function(e){ console.error(e); statusEl.textContent = "Network error. Please try again."; });
-  });
-
-  // --- Load + render
-  function loadComments(){
-    fetch(API, { cache:"no-store" })
-      .then(function(r){ return r.json(); })
-      .then(function(all){ render(all); })
-      .catch(function(e){ console.error(e); });
-  }
-
-  function bubbleUser(name, msg){
-    return '<div class="bubble-row user"><div class="bubble user">'+
-              '<span class="who">'+escapeHtml(name||"Anonymous")+'</span>'+
-              linkify(escapeHtml(msg||""))+
-           '</div></div>';
-  }
-  function bubbleDev(name, msg){
-    return '<div class="bubble-row dev"><div class="bubble dev">'+
-              '<span class="who">'+escapeHtml(name||"Anatomie Sonore")+'</span>'+
-              linkify(escapeHtml(msg||""))+
-           '</div></div>';
-  }
-
-  function render(all){
-    // compte par topic
-    var counts = {thanks:0, feature:0, bug:0};
-    for (var i=0;i<(all||[]).length;i++){
-      var t = all[i].topic||"";
-      if (counts[t]==null) counts[t]=0;
-      counts[t]+=1;
-    }
-    document.querySelector('.tab[data-topic="thanks"]').textContent = 'Thanks' + (counts.thanks ? ' ('+counts.thanks+' messages)' : '');
-    document.querySelector('.tab[data-topic="feature"]').textContent = 'Feature request' + (counts.feature ? ' ('+counts.feature+' messages)' : '');
-    document.querySelector('.tab[data-topic="bug"]').textContent = 'Bug report' + (counts.bug ? ' ('+counts.bug+' messages)' : '');
-
-    var data = (all||[]).filter(function(c){ return (c.topic||"")===currentTopic; });
-    var list = document.getElementById('list');
-    list.innerHTML = "";
-
-    var owned = []; try { owned = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]"); } catch(e){}
-
-    for (var k=0;k<data.length;k++){
-      (function(c){
-        var wrap = document.createElement('div');
-        wrap.className = 'thread';
-        wrap.setAttribute('data-id', c.id);
-
-        var thread = Array.isArray(c.thread) ? c.thread : [];
-        var totalCount = 1 + thread.length;
-        var admin = isAdmin();
-        var showBody = admin || totalCount > 1;
-
-        // header
-        var head = document.createElement('div');
-        head.className = 'thread-head' + ((totalCount>1 || admin) ? ' clickable' : '');
-        head.innerHTML =
-          '<div>'+
-            '<div class="meta"><span class="name">'+escapeHtml(c.name||'Anonymous')+'</span><span class="time">'+fmtDate(c.created_at)+'</span></div>'+
-            '<div class="preview">'+escapeHtml(snippet(c.message||""))+'</div>'+
-          '</div>'+
-          (totalCount>1 ? '<div class="count-badge" title="'+totalCount+' messages in this thread">'+totalCount+' messages</div>' : '<span></span>')+
-          (totalCount>1 ? '<div class="chev">▶</div>' : '');
-        wrap.appendChild(head);
-
-        // body
-        if (showBody){
-          var body = document.createElement('div');
-          body.className = 'thread-body';
-
-          // message initial en bulle si admin OU s’il existe des réponses
-          if (admin || totalCount>1){
-            body.insertAdjacentHTML('beforeend', bubbleUser(c.name, c.message));
-          }
-          // réponses
-          for (var i2=0;i2<thread.length;i2++){
-            var e = thread[i2];
-            if (e.by === 'dev') body.insertAdjacentHTML('beforeend', bubbleDev('Anatomie Sonore', e.message));
-            else body.insertAdjacentHTML('beforeend', bubbleUser(e.name||'Anonymous', e.message));
-          }
-
-          // actions
-          var actions = document.createElement('div');
-          actions.className = 'actions';
-          if (admin) {
-            actions.innerHTML =
-              '<button class="btn-small" data-action="reply">Reply</button>'+
-              '<button class="btn-small" data-action="delete">Delete</button>';
-          } else {
-            var hasDevReply = thread.some(function(e){ return e.by==='dev'; });
-            if (hasDevReply){
-              actions.innerHTML += '<button class="btn-small" data-action="reply-to-dev">Reply to dev</button>';
-            }
-            if (owned.indexOf(c.id)!==-1){
-              actions.innerHTML += '<button class="btn-small" data-action="edit">Edit</button>'+
-                                   '<button class="btn-small" data-action="del">Delete</button>';
-            }
-          }
-          body.appendChild(actions);
-
-          // zones inline
-          if (admin){
-            var ib = document.createElement('div'); ib.className='inlinebox';
-            ib.innerHTML =
-              '<textarea placeholder="Write a dev reply…"></textarea>'+
-              '<div class="actions">'+
-                '<button class="btn-small" data-action="send-reply">Send</button>'+
-                '<button class="btn-small" data-action="cancel-reply">Cancel</button>'+
-              '</div>';
-            body.appendChild(ib);
-          } else {
-            var hasDevReply2 = thread.some(function(e){ return e.by==='dev'; });
-            if (hasDevReply2){
-              var ib2 = document.createElement('div'); ib2.className='inlinebox';
-              var presetName = ((localStorage.getItem(NAME_STORE_KEY) || document.getElementById('name').value || "").trim().slice(0,40));
-              ib2.innerHTML =
-                '<textarea placeholder="Write your reply to dev…"></textarea>'+
-                '<div class="row2">'+
-                  '<input type="text" class="reply-name" placeholder="Your name" value="'+escapeHtml(presetName)+'" maxlength="40">'+
-                  '<button class="btn-small" data-action="send-user">Send</button>'+
-                  '<button class="btn-small" data-action="cancel-user">Cancel</button>'+
-                '</div>';
-              body.appendChild(ib2);
-            }
-          }
-
-          wrap.appendChild(body);
-
-          // listeners
-          head.addEventListener('click', function(){ wrap.classList.toggle('open'); });
-
-          if (admin){
-            var area = body.querySelector('.inlinebox');
-            var ta = area ? area.querySelector('textarea') : null;
-
-            var bReply = body.querySelector('[data-action="reply"]');
-            if (bReply) bReply.addEventListener('click', function(e){
-              e.stopPropagation(); if (!area) return; area.style.display='block'; if (ta){ ta.value=""; ta.focus(); }
-            });
-
-            var bCancel = body.querySelector('[data-action="cancel-reply"]');
-            if (bCancel) bCancel.addEventListener('click', function(e){
-              e.stopPropagation(); if (!area) return; area.style.display='none'; if (ta) ta.value="";
-            });
-
-            var bSend = body.querySelector('[data-action="send-reply"]');
-            if (bSend) bSend.addEventListener('click', function(e){
-              e.stopPropagation();
-              var text = (ta && ta.value || "").trim(); if (!text) return;
-              fetch(API+'/'+c.id+'/reply', {
-                method:"POST",
-                headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+ADMIN_TOKEN },
-                body: JSON.stringify({ reply: text })
-              }).then(function(r){ if(!r.ok){ alert("Reply failed"); return; } loadComments(); });
-            });
-
-            // ✅ DELETE ADMIN — toujours actif
-            var bDelete = body.querySelector('[data-action="delete"]');
-            if (bDelete) bDelete.addEventListener('click', function(e){
-              e.stopPropagation();
-              if (!confirm('Delete this thread?')) return;
-              fetch(API+'/'+c.id, { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } })
-                .then(function(r){
-                  if(!r.ok){ alert("Delete failed"); return; }
-                  // retire du DOM sans recharger
-                  wrap.remove();
-                })
-                .catch(function(){ alert("Network error"); });
-            });
-
-            // auto-ouvrir si fil solo pour voir les boutons
-            if (totalCount===1){ wrap.classList.add('open'); }
-          } else {
-            // VISITOR reply-to-dev
-            var area2 = body.querySelector('.inlinebox');
-            var ta2 = area2 ? area2.querySelector('textarea') : null;
-            var nameInput = area2 ? area2.querySelector('.reply-name') : null;
-
-            var bOpen = body.querySelector('[data-action="reply-to-dev"]');
-            if (bOpen) bOpen.addEventListener('click', function(e){
-              e.stopPropagation(); if (!area2) return; area2.style.display='block'; if (ta2){ ta2.value=""; } if(nameInput) nameInput.focus();
-            });
-
-            var bCancel2 = body.querySelector('[data-action="cancel-user"]');
-            if (bCancel2) bCancel2.addEventListener('click', function(e){
-              e.stopPropagation(); if (!area2) return; area2.style.display='none'; if (ta2) ta2.value="";
-            });
-
-            var bSend2 = body.querySelector('[data-action="send-user"]');
-            if (bSend2) bSend2.addEventListener('click', function(e){
-              e.stopPropagation(); if (!area2) return;
-              var text = (ta2 && ta2.value || "").trim();
-              var dispName = ((nameInput && nameInput.value) || "").trim().slice(0,40) || "Anonymous";
-              if (!text) return;
-
-              fetch(API+'/'+c.id+'/followup', {
-                method:"POST",
-                headers:{ "Content-Type":"application/json" },
-                body: JSON.stringify({ name: dispName, message: text })
-              }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
-                .then(function(x){
-                  if(!x.ok){ alert('Send failed ('+(x.j && x.j.error ? x.j.error : 'unknown')+')'); return; }
-                  localStorage.setItem("ns_display_name", dispName);
-                  area2.style.display='none'; if (ta2) ta2.value="";
-                  loadComments();
-                }).catch(function(){ alert("Network error"); });
-            });
-
-            // owner edit/del
-            if (owned.indexOf(c.id)!==-1){
-              var bDelOwner = body.querySelector('[data-action="del"]');
-              if (bDelOwner) bDelOwner.addEventListener('click', function(e){
-                e.stopPropagation();
-                if (!confirm('Delete your thread?')) return;
-                fetch(API+'/'+c.id, { method:"DELETE", headers:{ "Authorization":"Bearer owner:'+OWNER_TOKEN+'" } })
-                  .then(function(r){ if(!r.ok){ alert("Delete failed"); return; }
-                    var arr = []; try { arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]"); } catch(e){}
-                    var idx = arr.indexOf(c.id); if (idx!==-1){ arr.splice(idx,1); localStorage.setItem(OWNED_KEY, JSON.stringify(arr)); }
-                    wrap.remove();
-                  });
-              });
-
-              var bEdit = body.querySelector('[data-action="edit"]');
-              if (bEdit) bEdit.addEventListener('click', function(e){
-                e.stopPropagation();
-                var cur = prompt("Edit your message:", c.message||"");
-                if (cur==null) return;
-                var txt = String(cur).trim(); if (!txt) return;
-                fetch(API+'/'+c.id, {
-                  method:"PATCH",
-                  headers:{ "Content-Type":"application/json", "Authorization":"Bearer owner:'+OWNER_TOKEN+'" },
-                  body: JSON.stringify({ message: txt })
-                }).then(function(r){ if(!r.ok){ alert("Edit failed"); return; } loadComments(); });
-              });
-            }
-          } // end admin/visitor
-        } // end showBody
-
-        list.appendChild(wrap);
-      })(data[k]);
-    } // end for data
-  }
-
-  // init
-  (function(){
-    if (isAdmin()) {
-      fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } })
-        .then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
-        .then(function(x){ if (!x.ok || !x.j.ok) { ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token"); refreshAdminUI(); } })
-        .catch(function(){});
-    }
-    var lastName = localStorage.getItem("ns_display_name");
-    if (lastName) document.getElementById('name').value = lastName;
+document.querySelectorAll('#topics button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#topics button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTopic = btn.dataset.topic;
     loadComments();
-  })();
+  };
+});
+
+document.getElementById('post').onclick = async () => {
+  const name = document.getElementById('name').value;
+  const message = document.getElementById('message').value;
+  const res = await fetch(API + "/comments", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name, topic: currentTopic, message })
+  });
+  if (res.ok) {
+    document.getElementById('message').value = "";
+    loadComments();
+  } else {
+    alert("Send fail");
+  }
+};
+
+async function loadComments() {
+  const res = await fetch(API + "/comments");
+  const data = await res.json();
+  const filtered = data.filter(c => c.topic === currentTopic);
+  const container = document.getElementById('comments');
+  container.innerHTML = "";
+  filtered.forEach(c => {
+    const thread = document.createElement('div');
+    thread.className = 'thread';
+    const header = document.createElement('div');
+    header.className = 'thread-header';
+    header.innerHTML = `<div><strong>${c.name || "Anonymous"}</strong></div>
+                        <div class="meta">${new Date(c.created_at).toLocaleString()}</div>`;
+    const actions = document.createElement('div');
+    actions.className = 'actions';
+
+    if (isAdmin) {
+      const replyBtn = document.createElement('button');
+      replyBtn.textContent = "Reply";
+      replyBtn.onclick = () => replyTo(c.id);
+      const delBtn = document.createElement('button');
+      delBtn.textContent = "Delete";
+      delBtn.onclick = () => deleteComment(c.id);
+      actions.appendChild(replyBtn);
+      actions.appendChild(delBtn);
+    } else {
+      if (c.replies && c.replies.length > 0) {
+        const replyDevBtn = document.createElement('button');
+        replyDevBtn.textContent = "Reply to dev";
+        replyDevBtn.onclick = () => replyToDev(c.id);
+        actions.appendChild(replyDevBtn);
+      }
+    }
+
+    header.appendChild(actions);
+    thread.appendChild(header);
+
+    // Message principal
+    const mainRow = document.createElement('div');
+    mainRow.className = 'bubble-row user';
+    mainRow.innerHTML = `<div class="bubble user"><span class="who">${c.name || "Anonymous"}</span>${c.message}</div>`;
+    thread.appendChild(mainRow);
+
+    // Réponses
+    if (c.replies) {
+      c.replies.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'bubble-row ' + (r.by === "Anatomie Sonore" ? 'dev' : 'user');
+        row.innerHTML = `<div class="bubble ${r.by === "Anatomie Sonore" ? 'dev' : 'user'}">
+                           <span class="who">${r.by}</span>${r.message}
+                         </div>`;
+        thread.appendChild(row);
+      });
+    }
+
+    container.appendChild(thread);
+  });
+}
+
+async function replyTo(id) {
+  const reply = prompt("Reply:");
+  if (!reply) return;
+  const res = await fetch(API + `/comments/${id}/reply`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json", "Authorization": "Bearer " + adminToken},
+    body: JSON.stringify({ reply })
+  });
+  if (res.ok) loadComments();
+  else alert("Reply fail");
+}
+
+async function replyToDev(id) {
+  const reply = prompt("Reply to dev:");
+  if (!reply) return;
+  const res = await fetch(API + `/comments/${id}/reply`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ reply })
+  });
+  if (res.ok) loadComments();
+  else alert("Send fail");
+}
+
+async function deleteComment(id) {
+  if (!confirm("Delete comment?")) return;
+  const res = await fetch(API + `/comments/${id}`, {
+    method: "DELETE",
+    headers: {"Authorization": "Bearer " + adminToken}
+  });
+  if (res.ok) loadComments();
+  else alert("Delete fail");
+}
+
+// Mode admin auto si token déjà en mémoire
+(async () => {
+  const token = localStorage.getItem("adminToken");
+  if (token) {
+    const res = await fetch(API + "/admin/verify", {
+      method: "POST",
+      headers: {"Authorization": "Bearer " + token}
+    });
+    if (res.ok) {
+      isAdmin = true;
+      adminToken = token;
+    }
+  }
+  loadComments();
+})();
 </script>
+
 </body>
 </html>
