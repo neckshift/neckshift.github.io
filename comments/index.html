@@ -19,7 +19,7 @@
   .background img{width:100%;height:100%;object-fit:cover;filter:brightness(.28)}
   .wrap{max-width:920px;margin:28px auto;padding:0 16px}
 
-  /* Seuls header+tabs restent sticky */
+  /* Sticky uniquement pour l'entête + onglets */
   .sticky{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:var(--glass2);border:1px solid var(--line);border-radius:16px}
   .head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)}
   h2{margin:0;font-size:20px;color:#e8dfdf;font-weight:600}
@@ -35,7 +35,6 @@
   .tab[data-topic="feature"].active{color:#111;background:var(--blue);border-color:var(--blue)}
   .tab[data-topic="bug"].active{color:#111;background:var(--red);border-color:var(--red)}
 
-  /* Le formulaire n’est plus sticky */
   .panel{margin-top:14px;background:var(--glass);border:1px solid var(--line);border-radius:16px}
   .form{padding:12px;border-bottom:1px solid var(--line)}
   .row{display:grid;grid-template-columns:1fr;gap:10px}
@@ -72,10 +71,10 @@
   .bubble-row.user{justify-content:flex-start}
   .bubble-row.dev{justify-content:flex-end}
   .bubble{
-    width:78%;                /* <-- largeur fixe */
-    padding:8px 10px;         /* plus fin */
+    width:78%;
+    padding:8px 10px;
     border-radius:14px;
-    line-height:1.4;          /* plus serré */
+    line-height:1.4;
     font-size:15px;
     box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
     word-wrap:break-word;overflow-wrap:anywhere;
@@ -271,186 +270,203 @@
     var owned = []; try { owned = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]"); } catch(e){}
 
     for (var k=0;k<data.length;k++){
-      var c = data[k];
-      var wrap = document.createElement('div');
-      wrap.className = 'thread';
-      wrap.setAttribute('data-id', c.id);
+      (function(c){
+        var wrap = document.createElement('div');
+        wrap.className = 'thread';
+        wrap.setAttribute('data-id', c.id);
 
-      var thread = Array.isArray(c.thread) ? c.thread : [];
-      var totalCount = 1 + thread.length;
+        var thread = Array.isArray(c.thread) ? c.thread : [];
+        var totalCount = 1 + thread.length;
+        var admin = isAdmin();
+        var showBody = admin || totalCount > 1;
 
-      // header
-      var head = document.createElement('div');
-      head.className = 'thread-head' + (totalCount>1 ? ' clickable' : '');
-      head.innerHTML =
-        '<div>'+
-          '<div class="meta"><span class="name">'+escapeHtml(c.name||'Anonymous')+'</span><span class="time">'+fmtDate(c.created_at)+'</span></div>'+
-          '<div class="preview">'+escapeHtml(snippet(c.message||""))+'</div>'+
-        '</div>'+
-        (totalCount>1 ? '<div class="count-badge" title="'+totalCount+' messages in this thread">'+totalCount+' messages</div>' : '<span></span>')+
-        (totalCount>1 ? '<div class="chev">▶</div>' : '');
-      wrap.appendChild(head);
+        // header
+        var head = document.createElement('div');
+        head.className = 'thread-head' + ((totalCount>1 || admin) ? ' clickable' : '');
+        head.innerHTML =
+          '<div>'+
+            '<div class="meta"><span class="name">'+escapeHtml(c.name||'Anonymous')+'</span><span class="time">'+fmtDate(c.created_at)+'</span></div>'+
+            '<div class="preview">'+escapeHtml(snippet(c.message||""))+'</div>'+
+          '</div>'+
+          (totalCount>1 ? '<div class="count-badge" title="'+totalCount+' messages in this thread">'+totalCount+' messages</div>' : '<span></span>')+
+          (totalCount>1 ? '<div class="chev">▶</div>' : '');
+        wrap.appendChild(head);
 
-      // body (affiche le message initial + réponses uniquement si >1)
-      var body = document.createElement('div');
-      body.className = 'thread-body';
-      if (totalCount>1){
-        body.insertAdjacentHTML('beforeend', bubbleUser(c.name, c.message));
-        for (var i2=0;i2<thread.length;i2++){
-          var e = thread[i2];
-          if (e.by === 'dev') body.insertAdjacentHTML('beforeend', bubbleDev('Anatomie Sonore', e.message));
-          else body.insertAdjacentHTML('beforeend', bubbleUser(e.name||'Anonymous', e.message));
-        }
-      }
+        // body
+        if (showBody){
+          var body = document.createElement('div');
+          body.className = 'thread-body';
 
-      // has dev reply?
-      var hasDevReply = false;
-      for (var d=0; d<thread.length; d++) if (thread[d].by==='dev'){ hasDevReply=true; break; }
-
-      // actions (si >1)
-      if (totalCount>1){
-        var actions = document.createElement('div');
-        actions.className = 'actions';
-        if (isAdmin()) {
-          var b1 = document.createElement('button'); b1.className='btn-small'; b1.setAttribute('data-action','reply'); b1.textContent='Reply';
-          var b2 = document.createElement('button'); b2.className='btn-small'; b2.setAttribute('data-action','delete'); b2.textContent='Delete';
-          actions.appendChild(b1); actions.appendChild(b2);
-        } else {
-          if (hasDevReply){
-            var b3 = document.createElement('button'); b3.className='btn-small'; b3.setAttribute('data-action','reply-to-dev'); b3.textContent='Reply to dev';
-            actions.appendChild(b3);
+          // message initial en bulle si admin OU s’il existe des réponses
+          if (admin || totalCount>1){
+            body.insertAdjacentHTML('beforeend', bubbleUser(c.name, c.message));
           }
-          if (owned.indexOf(c.id)!==-1){
-            var b4 = document.createElement('button'); b4.className='btn-small'; b4.setAttribute('data-action','edit'); b4.textContent='Edit';
-            var b5 = document.createElement('button'); b5.className='btn-small'; b5.setAttribute('data-action','del'); b5.textContent='Delete';
-            actions.appendChild(b4); actions.appendChild(b5);
+          // réponses
+          for (var i2=0;i2<thread.length;i2++){
+            var e = thread[i2];
+            if (e.by === 'dev') body.insertAdjacentHTML('beforeend', bubbleDev('Anatomie Sonore', e.message));
+            else body.insertAdjacentHTML('beforeend', bubbleUser(e.name||'Anonymous', e.message));
           }
-        }
-        body.appendChild(actions);
 
-        // inline boxes
-        if (isAdmin()){
-          var ib = document.createElement('div'); ib.className='inlinebox';
-          ib.innerHTML =
-            '<textarea placeholder="Write a dev reply…"></textarea>'+
-            '<div class="actions">'+
-              '<button class="btn-small" data-action="send-reply">Send</button>'+
-              '<button class="btn-small" data-action="cancel-reply">Cancel</button>'+
-            '</div>';
-          body.appendChild(ib);
-        } else if (hasDevReply){
-          var ib2 = document.createElement('div'); ib2.className='inlinebox';
-          var presetName = ((localStorage.getItem(NAME_STORE_KEY) || document.getElementById('name').value || "").trim().slice(0,40));
-          ib2.innerHTML =
-            '<textarea placeholder="Write your reply to dev…"></textarea>'+
-            '<div class="row2">'+
-              '<input type="text" class="reply-name" placeholder="Your name" value="'+escapeHtml(presetName)+'" maxlength="40">'+
-              '<button class="btn-small" data-action="send-user">Send</button>'+
-              '<button class="btn-small" data-action="cancel-user">Cancel</button>'+
-            '</div>';
-          body.appendChild(ib2);
-        }
+          // actions
+          var actions = document.createElement('div');
+          actions.className = 'actions';
+          if (admin) {
+            actions.innerHTML =
+              '<button class="btn-small" data-action="reply">Reply</button>'+
+              '<button class="btn-small" data-action="delete">Delete</button>';
+          } else {
+            var hasDevReply = thread.some(function(e){ return e.by==='dev'; });
+            if (hasDevReply){
+              actions.innerHTML += '<button class="btn-small" data-action="reply-to-dev">Reply to dev</button>';
+            }
+            if (owned.indexOf(c.id)!==-1){
+              actions.innerHTML += '<button class="btn-small" data-action="edit">Edit</button>'+
+                                   '<button class="btn-small" data-action="del">Delete</button>';
+            }
+          }
+          body.appendChild(actions);
 
-        wrap.appendChild(body);
-      }
+          // zones inline
+          if (admin){
+            var ib = document.createElement('div'); ib.className='inlinebox';
+            ib.innerHTML =
+              '<textarea placeholder="Write a dev reply…"></textarea>'+
+              '<div class="actions">'+
+                '<button class="btn-small" data-action="send-reply">Send</button>'+
+                '<button class="btn-small" data-action="cancel-reply">Cancel</button>'+
+              '</div>';
+            body.appendChild(ib);
+          } else {
+            var hasDevReply2 = thread.some(function(e){ return e.by==='dev'; });
+            if (hasDevReply2){
+              var ib2 = document.createElement('div'); ib2.className='inlinebox';
+              var presetName = ((localStorage.getItem(NAME_STORE_KEY) || document.getElementById('name').value || "").trim().slice(0,40));
+              ib2.innerHTML =
+                '<textarea placeholder="Write your reply to dev…"></textarea>'+
+                '<div class="row2">'+
+                  '<input type="text" class="reply-name" placeholder="Your name" value="'+escapeHtml(presetName)+'" maxlength="40">'+
+                  '<button class="btn-small" data-action="send-user">Send</button>'+
+                  '<button class="btn-small" data-action="cancel-user">Cancel</button>'+
+                '</div>';
+              body.appendChild(ib2);
+            }
+          }
 
-      list.appendChild(wrap);
+          wrap.appendChild(body);
 
-      // interactions
-      if (totalCount>1){
-        head.addEventListener('click', function(w){ return function(){ w.classList.toggle('open'); }; }(wrap));
-      }
+          // listeners
+          head.addEventListener('click', function(){ wrap.classList.toggle('open'); });
 
-      if (isAdmin() && totalCount>1){
-        (function(){
-          var ib = body.querySelector('.inlinebox');
-          var ta = ib ? ib.querySelector('textarea') : null;
+          if (admin){
+            var area = body.querySelector('.inlinebox');
+            var ta = area ? area.querySelector('textarea') : null;
 
-          var btnReply = body.querySelector('[data-action="reply"]');
-          if (btnReply) btnReply.addEventListener('click', function(e){ e.stopPropagation(); ib.style.display='block'; ta.value=""; ta.focus(); });
+            var bReply = body.querySelector('[data-action="reply"]');
+            if (bReply) bReply.addEventListener('click', function(e){
+              e.stopPropagation(); if (!area) return; area.style.display='block'; if (ta){ ta.value=""; ta.focus(); }
+            });
 
-          var btnCancel = body.querySelector('[data-action="cancel-reply"]');
-          if (btnCancel) btnCancel.addEventListener('click', function(e){ e.stopPropagation(); ib.style.display='none'; ta.value=""; });
+            var bCancel = body.querySelector('[data-action="cancel-reply"]');
+            if (bCancel) bCancel.addEventListener('click', function(e){
+              e.stopPropagation(); if (!area) return; area.style.display='none'; if (ta) ta.value="";
+            });
 
-          var btnSend = body.querySelector('[data-action="send-reply"]');
-          if (btnSend) btnSend.addEventListener('click', function(e){
-            e.stopPropagation();
-            var text = (ta.value||"").trim(); if (!text) return;
-            fetch(API+'/'+c.id+'/reply', {
-              method:"POST",
-              headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+ADMIN_TOKEN },
-              body: JSON.stringify({ reply: text })
-            }).then(function(r){ if(!r.ok){ alert("Reply failed"); return; } loadComments(); });
-          });
+            var bSend = body.querySelector('[data-action="send-reply"]');
+            if (bSend) bSend.addEventListener('click', function(e){
+              e.stopPropagation();
+              var text = (ta && ta.value || "").trim(); if (!text) return;
+              fetch(API+'/'+c.id+'/reply', {
+                method:"POST",
+                headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+ADMIN_TOKEN },
+                body: JSON.stringify({ reply: text })
+              }).then(function(r){ if(!r.ok){ alert("Reply failed"); return; } loadComments(); });
+            });
 
-          var btnDel = body.querySelector('[data-action="delete"]');
-          if (btnDel) btnDel.addEventListener('click', function(e){
-            e.stopPropagation();
-            if (!confirm('Delete this thread?')) return;
-            fetch(API+'/'+c.id, { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } })
-              .then(function(r){ if(!r.ok){ alert("Delete failed"); return; } loadComments(); });
-          });
-        })();
-      } else if (!isAdmin() && totalCount>1){
-        (function(){
-          var ib = body.querySelector('.inlinebox');
-          var ta = ib ? ib.querySelector('textarea') : null;
-          var nameInput = ib ? ib.querySelector('.reply-name') : null;
+            // ✅ DELETE ADMIN — toujours actif
+            var bDelete = body.querySelector('[data-action="delete"]');
+            if (bDelete) bDelete.addEventListener('click', function(e){
+              e.stopPropagation();
+              if (!confirm('Delete this thread?')) return;
+              fetch(API+'/'+c.id, { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } })
+                .then(function(r){
+                  if(!r.ok){ alert("Delete failed"); return; }
+                  // retire du DOM sans recharger
+                  wrap.remove();
+                })
+                .catch(function(){ alert("Network error"); });
+            });
 
-          var btnOpen = body.querySelector('[data-action="reply-to-dev"]');
-          if (btnOpen) btnOpen.addEventListener('click', function(e){ e.stopPropagation(); if(!ib) return; ib.style.display='block'; ta.value=""; if(nameInput) nameInput.focus(); });
+            // auto-ouvrir si fil solo pour voir les boutons
+            if (totalCount===1){ wrap.classList.add('open'); }
+          } else {
+            // VISITOR reply-to-dev
+            var area2 = body.querySelector('.inlinebox');
+            var ta2 = area2 ? area2.querySelector('textarea') : null;
+            var nameInput = area2 ? area2.querySelector('.reply-name') : null;
 
-          var btnCancel = body.querySelector('[data-action="cancel-user"]');
-          if (btnCancel) btnCancel.addEventListener('click', function(e){ e.stopPropagation(); if(!ib) return; ib.style.display='none'; ta.value=""; });
+            var bOpen = body.querySelector('[data-action="reply-to-dev"]');
+            if (bOpen) bOpen.addEventListener('click', function(e){
+              e.stopPropagation(); if (!area2) return; area2.style.display='block'; if (ta2){ ta2.value=""; } if(nameInput) nameInput.focus();
+            });
 
-          var btnSend = body.querySelector('[data-action="send-user"]');
-          if (btnSend) btnSend.addEventListener('click', function(e){
-            e.stopPropagation(); if(!ib) return;
-            var text = (ta.value||"").trim();
-            var dispName = ((nameInput && nameInput.value) || "").trim().slice(0,40) || "Anonymous";
-            if (!text) return;
+            var bCancel2 = body.querySelector('[data-action="cancel-user"]');
+            if (bCancel2) bCancel2.addEventListener('click', function(e){
+              e.stopPropagation(); if (!area2) return; area2.style.display='none'; if (ta2) ta2.value="";
+            });
 
-            fetch(API+'/'+c.id+'/followup', {
-              method:"POST",
-              headers:{ "Content-Type":"application/json" },
-              body: JSON.stringify({ name: dispName, message: text })
-            }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
-              .then(function(x){
-                if(!x.ok){ alert('Send failed ('+(x.j && x.j.error ? x.j.error : 'unknown')+')'); return; }
-                localStorage.setItem("ns_display_name", dispName);
-                ib.style.display='none'; ta.value="";
-                loadComments();
-              }).catch(function(){ alert("Network error"); });
-          });
+            var bSend2 = body.querySelector('[data-action="send-user"]');
+            if (bSend2) bSend2.addEventListener('click', function(e){
+              e.stopPropagation(); if (!area2) return;
+              var text = (ta2 && ta2.value || "").trim();
+              var dispName = ((nameInput && nameInput.value) || "").trim().slice(0,40) || "Anonymous";
+              if (!text) return;
 
-          // owner edit/del
-          var btnDel = body.querySelector('[data-action="del"]');
-          if (btnDel) btnDel.addEventListener('click', function(e){
-            e.stopPropagation();
-            if (!confirm('Delete your thread?')) return;
-            fetch(API+'/'+c.id, { method:"DELETE", headers:{ "Authorization":"Bearer owner:'+OWNER_TOKEN+'" } })
-              .then(function(r){ if(!r.ok){ alert("Delete failed"); return; }
-                var arr = []; try { arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]"); } catch(e){}
-                var idx = arr.indexOf(c.id); if (idx!==-1){ arr.splice(idx,1); localStorage.setItem(OWNED_KEY, JSON.stringify(arr)); }
-                loadComments();
+              fetch(API+'/'+c.id+'/followup', {
+                method:"POST",
+                headers:{ "Content-Type":"application/json" },
+                body: JSON.stringify({ name: dispName, message: text })
+              }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok,j:j}; }); })
+                .then(function(x){
+                  if(!x.ok){ alert('Send failed ('+(x.j && x.j.error ? x.j.error : 'unknown')+')'); return; }
+                  localStorage.setItem("ns_display_name", dispName);
+                  area2.style.display='none'; if (ta2) ta2.value="";
+                  loadComments();
+                }).catch(function(){ alert("Network error"); });
+            });
+
+            // owner edit/del
+            if (owned.indexOf(c.id)!==-1){
+              var bDelOwner = body.querySelector('[data-action="del"]');
+              if (bDelOwner) bDelOwner.addEventListener('click', function(e){
+                e.stopPropagation();
+                if (!confirm('Delete your thread?')) return;
+                fetch(API+'/'+c.id, { method:"DELETE", headers:{ "Authorization":"Bearer owner:'+OWNER_TOKEN+'" } })
+                  .then(function(r){ if(!r.ok){ alert("Delete failed"); return; }
+                    var arr = []; try { arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]"); } catch(e){}
+                    var idx = arr.indexOf(c.id); if (idx!==-1){ arr.splice(idx,1); localStorage.setItem(OWNED_KEY, JSON.stringify(arr)); }
+                    wrap.remove();
+                  });
               });
-          });
 
-          var btnEdit = body.querySelector('[data-action="edit"]');
-          if (btnEdit) btnEdit.addEventListener('click', function(e){
-            e.stopPropagation();
-            var cur = prompt("Edit your message:", c.message||"");
-            if (cur==null) return;
-            var txt = String(cur).trim(); if (!txt) return;
-            fetch(API+'/'+c.id, {
-              method:"PATCH",
-              headers:{ "Content-Type":"application/json", "Authorization":"Bearer owner:'+OWNER_TOKEN+'" },
-              body: JSON.stringify({ message: txt })
-            }).then(function(r){ if(!r.ok){ alert("Edit failed"); return; } loadComments(); });
-          });
-        })();
-      }
+              var bEdit = body.querySelector('[data-action="edit"]');
+              if (bEdit) bEdit.addEventListener('click', function(e){
+                e.stopPropagation();
+                var cur = prompt("Edit your message:", c.message||"");
+                if (cur==null) return;
+                var txt = String(cur).trim(); if (!txt) return;
+                fetch(API+'/'+c.id, {
+                  method:"PATCH",
+                  headers:{ "Content-Type":"application/json", "Authorization":"Bearer owner:'+OWNER_TOKEN+'" },
+                  body: JSON.stringify({ message: txt })
+                }).then(function(r){ if(!r.ok){ alert("Edit failed"); return; } loadComments(); });
+              });
+            }
+          } // end admin/visitor
+        } // end showBody
 
+        list.appendChild(wrap);
+      })(data[k]);
     } // end for data
   }
 
