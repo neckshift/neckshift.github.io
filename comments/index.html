@@ -41,17 +41,18 @@
 
   .panel{margin-top:14px;background:var(--glass);border:1px solid var(--line);border-radius:16px}
   .list{padding:6px 12px}
+
   .thread{border-bottom:1px solid var(--line);background:rgba(255,255,255,.02)}
   .thread:nth-child(odd){background:rgba(0,0,0,.18)} /* alternance par fil */
 
-  /* Header cliquable */
+  /* Header */
   .thread-head{
     display:flex;align-items:center;gap:10px;justify-content:space-between;
     padding:14px 10px;
   }
   .thread-head.clickable{cursor:pointer}
   .meta{font-size:13px;color:#b6b6b6}
-  .name{font-weight:600;color:#f0eded;font-style:italic;font-size:1.02rem}
+  .name{font-weight:600;color:#f0eded;font-style:italic;font-size:1.06rem}
   .time{color:#9e9e9e;margin-left:8px}
   .preview{color:#ddd;opacity:.9;margin-top:4px;max-width:70ch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .count-badge{
@@ -62,27 +63,33 @@
   .chev{margin-left:10px;opacity:.7;transition:.2s}
   .thread.open .chev{transform:rotate(90deg);opacity:1}
 
-  /* Contenu du thread (caché par défaut) */
+  /* Body */
   .thread-body{display:none;padding:0 10px 12px}
   .thread.open .thread-body{display:block}
 
-  /* Bubbles (chat-like) */
-  .bubble{margin-top:10px;display:flex;gap:8px}
-  .bubble.user{justify-content:flex-start}
-  .bubble.dev{justify-content:flex-end}
-  .bubble .msg{
-    max-width:72%;padding:10px 12px;border-radius:14px;line-height:1.55;
+  /* Chat bubbles spanning the width */
+  .bubble-row{display:flex;width:100%;margin-top:10px}
+  .bubble-row.user{justify-content:flex-start}
+  .bubble-row.dev{justify-content:flex-end}
+  .bubble{
+    max-width:78%;
+    padding:10px 12px;border-radius:14px;line-height:1.55;
     box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+    word-wrap:break-word;overflow-wrap:anywhere;
   }
-  .bubble.user .msg{background:var(--userBubble)}
-  .bubble.dev .msg{background:var(--devBubble);border:1px solid rgba(110,240,168,.25)}
-  .bubble .who{display:block;margin-bottom:4px;font-style:italic;font-size:1.03rem;opacity:.95}
+  .bubble.user{background:var(--userBubble)}
+  .bubble.dev{background:var(--devBubble);border:1px solid rgba(110,240,168,.25)}
+  .who{display:block;margin-bottom:4px;font-style:italic;font-size:1.05rem;opacity:.95}
 
   .actions{display:flex;gap:6px;margin-top:12px}
   .inlinebox{display:none;margin-top:8px}
   .inlinebox textarea{width:100%;min-height:80px}
   .inlinebox .row2{display:flex;gap:8px;align-items:center;margin-top:6px}
   .inlinebox input[type="text"]{width:220px}
+
+  /* small fade-in */
+  .fade{animation:fade .15s ease-in}
+  @keyframes fade{from{opacity:.2; transform: translateY(3px)} to{opacity:1; transform:none}}
 </style>
 </head>
 <body>
@@ -127,11 +134,9 @@
   const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
   const API = API_BASE + "/comments";
 
-  // Admin session
   let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
   const isAdmin = () => !!ADMIN_TOKEN;
 
-  // Owner token (for edit/delete own top-level)
   const OWNER_TOKEN_KEY = "ns_owner_token";
   if (!localStorage.getItem(OWNER_TOKEN_KEY)) {
     const t = crypto.getRandomValues(new Uint8Array(16)).reduce((s,b)=>s+("0"+b.toString(16)).slice(-2),"");
@@ -139,17 +144,17 @@
   }
   const OWNER_TOKEN = localStorage.getItem(OWNER_TOKEN_KEY);
   const OWNED_KEY = "ns_owned_ids";
-
-  // Remember last used display name for follow-ups
   const NAME_STORE_KEY = "ns_display_name";
 
-  // UI helpers
   function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
   function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
   function fmtDate(s){ try{ return new Date(s||Date.now()).toLocaleString(); }catch{ return ""; } }
   function snippet(s){ s = String(s||""); return s.length>140 ? s.slice(0,140)+"…" : s; }
 
-  // Tabs
+  // Cache en mémoire pour switch d'onglet instantané
+  let CACHE = { all: null, fetchedAt: 0 };
+  const CACHE_TTL_MS = 10000;
+
   let currentTopic = "thanks";
   const tabEls = document.querySelectorAll(".tab");
   tabEls.forEach(btn=>{
@@ -157,11 +162,13 @@
       tabEls.forEach(b=>b.classList.remove("active"));
       btn.classList.add("active");
       currentTopic = btn.dataset.topic;
-      loadComments();
+      // rendu instantané depuis le cache si dispo
+      if (CACHE.all) render(CACHE.all);
+      // rafraîchit en arrière-plan si cache vieux
+      if (Date.now() - CACHE.fetchedAt > CACHE_TTL_MS) fetchAll(true);
     });
   });
 
-  // Admin UI
   const adminBtn=document.getElementById("adminToggle");
   const adminPanel=document.getElementById("adminPanel");
   const adminPwd=document.getElementById("adminPassword");
@@ -177,7 +184,7 @@
     if (isAdmin()) {
       if (confirm("Disable admin mode?")) {
         ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token");
-        refreshAdminUI(); loadComments();
+        refreshAdminUI(); fetchAll(true);
       }
     } else { adminPanel.style.display="flex"; adminPwd.value=""; adminPwd.focus(); }
   });
@@ -187,12 +194,11 @@
     const ok = r.ok && (await r.json().catch(()=>({ok:false}))).ok;
     if (!ok) { alert("Wrong password"); return; }
     ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
-    refreshAdminUI(); loadComments();
+    refreshAdminUI(); fetchAll(true);
   });
   adminCancel.addEventListener("click", ()=>{ adminPanel.style.display="none"; adminPwd.value=""; });
   refreshAdminUI();
 
-  // Post top-level
   document.getElementById("postBtn").addEventListener("click", submitComment);
   async function submitComment(){
     const statusEl = document.getElementById('status');
@@ -217,93 +223,84 @@
       document.getElementById('message').value = "";
       if (name) localStorage.setItem(NAME_STORE_KEY, name);
 
-      // remember ownership
       const arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]");
       if (!arr.includes(data.id)) { arr.push(data.id); localStorage.setItem(OWNED_KEY, JSON.stringify(arr)); }
 
-      loadComments();
+      // maj cache local + re-render immédiat
+      if (CACHE.all) CACHE.all.unshift(data);
+      render(CACHE.all || [data]);
+      // refresh background
+      fetchAll(true);
     }catch(e){ console.error(e); statusEl.textContent = "Network error. Please try again."; }
   }
 
-  async function loadComments(){
+  async function fetchAll(force=false){
+    if (!force && CACHE.all && Date.now() - CACHE.fetchedAt < CACHE_TTL_MS) return;
     try{
-      const r = await fetch(API);
+      const r = await fetch(API, { cache: "no-store" });
       const all = await r.json();
+      CACHE = { all, fetchedAt: Date.now() };
+      render(all);
+    }catch(e){ console.error(e); }
+  }
 
-      // === Compteurs par onglet ===
-      const counts = { thanks:0, feature:0, bug:0 };
-      (all||[]).forEach(c=>{
-        if (!counts[c.topic]) counts[c.topic]=0;
-        counts[c.topic] += 1;
-      });
-      document.querySelector('.tab[data-topic="thanks"]').textContent =
-        `Thanks${counts.thanks ? ' ('+counts.thanks+' messages)' : ''}`;
-      document.querySelector('.tab[data-topic="feature"]').textContent =
-        `Feature request${counts.feature ? ' ('+counts.feature+' messages)' : ''}`;
-      document.querySelector('.tab[data-topic="bug"]').textContent =
-        `Bug report${counts.bug ? ' ('+counts.bug+' messages)' : ''}`;
+  function render(all){
+    const counts = { thanks:0, feature:0, bug:0 };
+    (all||[]).forEach(c=>{ if (counts[c.topic]==null) counts[c.topic]=0; counts[c.topic]+=1; });
+    document.querySelector('.tab[data-topic="thanks"]').textContent =
+      `Thanks${counts.thanks ? ' ('+counts.thanks+' messages)' : ''}`;
+    document.querySelector('.tab[data-topic="feature"]').textContent =
+      `Feature request${counts.feature ? ' ('+counts.feature+' messages)' : ''}`;
+    document.querySelector('.tab[data-topic="bug"]').textContent =
+      `Bug report${counts.bug ? ' ('+counts.bug+' messages)' : ''}`;
 
-      // === Liste filtrée par topic ===
-      const data = (all||[]).filter(c=> (c.topic||"") === currentTopic);
-      const list = document.getElementById('list');
-      list.innerHTML = "";
+    const data = (all||[]).filter(c=> (c.topic||"") === currentTopic);
+    const list = document.getElementById('list');
+    const frag = document.createDocumentFragment();
+    const owned = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]");
 
-      const owned = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]");
+    data.forEach(c=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'thread fade';
+      wrap.dataset.id = c.id;
 
-      data.forEach(c=>{
-        const wrap = document.createElement('div');
-        wrap.className = 'thread'; // fermé par défaut
-        wrap.dataset.id = c.id;
+      const t = Array.isArray(c.thread) ? c.thread : [];
+      const totalCount = 1 + t.length;
 
-        // entries (thread)
-        const t = Array.isArray(c.thread) ? c.thread : [];
-        const totalCount = 1 + t.length; // 1 = message initial
-
-        // header (cliquable seulement si totalCount > 1)
-        const head = document.createElement('div');
-        head.className = 'thread-head' + (totalCount>1 ? ' clickable' : '');
-        head.innerHTML = `
-          <div>
-            <div class="meta">
-              <span class="name">${escapeHtml(c.name || 'Anonymous')}</span>
-              <span class="time">${fmtDate(c.created_at)}</span>
-            </div>
-            <div class="preview">${escapeHtml(snippet(c.message||''))}</div>
+      const head = document.createElement('div');
+      head.className = 'thread-head' + (totalCount>1 ? ' clickable' : '');
+      head.innerHTML = `
+        <div>
+          <div class="meta">
+            <span class="name">${escapeHtml(c.name || 'Anonymous')}</span>
+            <span class="time">${fmtDate(c.created_at)}</span>
           </div>
-          ${totalCount>1 ? `<div class="count-badge" title="${totalCount} messages in this thread">${totalCount} messages</div>` : `<span></span>`}
-          ${totalCount>1 ? `<div class="chev">▶</div>` : ``}
-        `;
-        wrap.appendChild(head);
+          <div class="preview">${escapeHtml(snippet(c.message||''))}</div>
+        </div>
+        ${totalCount>1 ? `<div class="count-badge" title="${totalCount} messages in this thread">${totalCount} messages</div>` : `<span></span>`}
+        ${totalCount>1 ? `<div class="chev">▶</div>` : ``}
+      `;
+      wrap.appendChild(head);
 
-        // body: n'affiche QUE les réponses (pas le message initial)
-        const body = document.createElement('div');
-        body.className = 'thread-body';
-
-        // bulles
+      // body: en bulles, incluant le message initial (user, à gauche)
+      const body = document.createElement('div');
+      body.className = 'thread-body';
+      if (totalCount>1) {
+        body.insertAdjacentHTML('beforeend', bubbleUser(c.name, c.message));
         t.forEach(entry=>{
-          if (entry.by === 'dev') {
-            body.insertAdjacentHTML('beforeend',
-              `<div class="bubble dev"><div class="msg">
-                 <span class="who">Anatomie Sonore</span>
-                 ${linkify(escapeHtml(entry.message||''))}
-               </div></div>`);
-          } else {
-            body.insertAdjacentHTML('beforeend',
-              `<div class="bubble user"><div class="msg">
-                 <span class="who">${escapeHtml(entry.name||'Anonymous')}</span>
-                 ${linkify(escapeHtml(entry.message||''))}
-               </div></div>`);
-          }
+          if (entry.by === 'dev') body.insertAdjacentHTML('beforeend', bubbleDev('Anatomie Sonore', entry.message));
+          else body.insertAdjacentHTML('beforeend', bubbleUser(entry.name||'Anonymous', entry.message));
         });
+      }
 
-        // logique: bouton "Reply to dev" uniquement s'il existe au moins une réponse dev
-        const hasDevReply = t.some(e => e.by === 'dev');
+      const hasDevReply = t.some(e => e.by === 'dev');
 
-        // actions
-        let actionsHTML = `<div class="actions">`;
+      let actionsHTML = '';
+      if (totalCount>1) {
+        actionsHTML += `<div class="actions">`;
         if (isAdmin()) {
-          if (true) actionsHTML += `<button class="btn-small" data-action="reply">Reply</button>`;
-          actionsHTML += `<button class="btn-small" data-action="delete">Delete</button>`;
+          actionsHTML += `<button class="btn-small" data-action="reply">Reply</button>
+                          <button class="btn-small" data-action="delete">Delete</button>`;
         } else {
           if (hasDevReply) actionsHTML += `<button class="btn-small" data-action="reply-to-dev">Reply to dev</button>`;
           if (owned.includes(c.id)) {
@@ -312,54 +309,46 @@
           }
         }
         actionsHTML += `</div>`;
-        body.insertAdjacentHTML('beforeend', actionsHTML);
+      }
+      if (actionsHTML) body.insertAdjacentHTML('beforeend', actionsHTML);
 
-        // zones inline
+      if (isAdmin() && totalCount>1) {
+        body.insertAdjacentHTML('beforeend', `
+          <div class="inlinebox">
+            <textarea placeholder="Write a dev reply…"></textarea>
+            <div class="actions">
+              <button class="btn-small" data-action="send-reply">Send</button>
+              <button class="btn-small" data-action="cancel-reply">Cancel</button>
+            </div>
+          </div>`);
+      } else if (!isAdmin() && totalCount>1 && hasDevReply) {
+        const presetName = (localStorage.getItem(NAME_STORE_KEY) || document.getElementById('name').value || "").trim().slice(0,40);
+        body.insertAdjacentHTML('beforeend', `
+          <div class="inlinebox">
+            <textarea placeholder="Write your reply to dev…"></textarea>
+            <div class="row2">
+              <input type="text" class="reply-name" placeholder="Your name" value="${escapeHtml(presetName)}" maxlength="40">
+              <button class="btn-small" data-action="send-user">Send</button>
+              <button class="btn-small" data-action="cancel-user">Cancel</button>
+            </div>
+          </div>`);
+      }
+
+      if (totalCount>1) wrap.appendChild(body);
+      frag.appendChild(wrap);
+
+      // interactions
+      if (totalCount>1) {
+        head.addEventListener('click', ()=>{ wrap.classList.toggle('open'); });
+
         if (isAdmin()) {
-          body.insertAdjacentHTML('beforeend', `
-            <div class="inlinebox">
-              <textarea placeholder="Write a dev reply…"></textarea>
-              <div class="actions">
-                <button class="btn-small" data-action="send-reply">Send</button>
-                <button class="btn-small" data-action="cancel-reply">Cancel</button>
-              </div>
-            </div>`);
-        } else if (hasDevReply) {
-          const presetName = (localStorage.getItem(NAME_STORE_KEY) || document.getElementById('name').value || "").trim().slice(0,40);
-          body.insertAdjacentHTML('beforeend', `
-            <div class="inlinebox">
-              <textarea placeholder="Write your reply to dev…"></textarea>
-              <div class="row2">
-                <input type="text" class="reply-name" placeholder="Your name" value="${escapeHtml(presetName)}" maxlength="40">
-                <button class="btn-small" data-action="send-user">Send</button>
-                <button class="btn-small" data-action="cancel-user">Cancel</button>
-              </div>
-            </div>`);
-        }
-
-        // append body
-        if (totalCount>1) wrap.appendChild(body); // on n’ajoute le body que s’il y a des réponses
-
-        // append to list
-        list.appendChild(wrap);
-
-        // interactions
-        if (totalCount>1) {
-          head.addEventListener('click', ()=>{
-            wrap.classList.toggle('open');
-          });
-        }
-
-        if (isAdmin() && totalCount>1) {
           const ib = body.querySelector('.inlinebox');
           const ta = ib?.querySelector('textarea');
           body.querySelector('[data-action="reply"]')?.addEventListener('click', (e)=>{
-            e.stopPropagation();
-            ib.style.display='block'; ta.value=""; ta.focus();
+            e.stopPropagation(); ib.style.display='block'; ta.value=""; ta.focus();
           });
           body.querySelector('[data-action="cancel-reply"]')?.addEventListener('click', (e)=>{
-            e.stopPropagation();
-            ib.style.display='none'; ta.value="";
+            e.stopPropagation(); ib.style.display='none'; ta.value="";
           });
           body.querySelector('[data-action="send-reply"]')?.addEventListener('click', async (e)=>{
             e.stopPropagation();
@@ -370,69 +359,22 @@
               body: JSON.stringify({ reply: text })
             });
             if (!rr.ok){ alert("Reply failed"); return; }
-            loadComments();
+            fetchAll(true);
           });
-        }
-
-        // delete (admin or owner)
-        const deleteAction = async (e)=>{
-          e?.stopPropagation?.();
-          if (!confirm('Delete this thread?')) return;
-          const headers = isAdmin()
-            ? { "Authorization":`Bearer ${ADMIN_TOKEN}` }
-            : { "Authorization": `Bearer owner:${OWNER_TOKEN}` };
-          const rr = await fetch(`${API}/${c.id}`, { method:"DELETE", headers });
-          if (!rr.ok){ alert("Delete failed"); return; }
-          if (!isAdmin()){
-            const arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]").filter(id=>id!==c.id);
-            localStorage.setItem(OWNED_KEY, JSON.stringify(arr));
-          }
-          loadComments();
-        };
-        if (totalCount>1) {
-          body.querySelector('[data-action="delete"]')?.addEventListener('click', deleteAction);
+          body.querySelector('[data-action="delete"]')?.addEventListener('click', (e)=> deleteThread(e, c.id, true));
         } else {
-          head.querySelector('[data-action="delete"]')?.addEventListener?.('click', deleteAction);
-        }
-
-        // owner edit/del (top-level) only in body presence (has actions there)
-        if (!isAdmin() && totalCount>1){
-          body.querySelector('[data-action="del"]')?.addEventListener('click', deleteAction);
-          body.querySelector('[data-action="edit"]')?.addEventListener('click', async (e)=>{
-            e.stopPropagation();
-            const cur = prompt("Edit your message:", c.message||"");
-            if (cur==null) return;
-            const txt = String(cur).trim(); if (!txt) return;
-            const rr = await fetch(`${API}/${c.id}`, {
-              method:"PATCH",
-              headers:{ "Content-Type":"application/json", "Authorization": `Bearer owner:${OWNER_TOKEN}` },
-              body: JSON.stringify({ message: txt })
-            });
-            if (!rr.ok){ alert("Edit failed"); return; }
-            loadComments();
-          });
-        }
-
-        // visitor reply-to-dev
-        if (!isAdmin() && totalCount>1 && hasDevReply) {
           const ib = body.querySelector('.inlinebox');
           const ta = ib?.querySelector('textarea');
           const nameInput = ib?.querySelector('.reply-name');
 
           body.querySelector('[data-action="reply-to-dev"]')?.addEventListener('click', (e)=>{
-            e.stopPropagation();
-            if (!ib) return;
-            ib.style.display='block'; ta.value=""; (nameInput && nameInput.focus());
+            e.stopPropagation(); if (!ib) return; ib.style.display='block'; ta.value=""; (nameInput && nameInput.focus());
           });
           body.querySelector('[data-action="cancel-user"]')?.addEventListener('click', (e)=>{
-            e.stopPropagation();
-            if (!ib) return;
-            ib.style.display='none'; ta.value="";
+            e.stopPropagation(); if (!ib) return; ib.style.display='none'; ta.value="";
           });
-
           body.querySelector('[data-action="send-user"]')?.addEventListener('click', async (e)=>{
-            e.stopPropagation();
-            if (!ib) return;
+            e.stopPropagation(); if (!ib) return;
             const text = (ta.value||"").trim();
             const dispName = (nameInput?.value || "").trim().slice(0,40) || "Anonymous";
             if (!text) return;
@@ -443,31 +385,75 @@
                 headers:{ "Content-Type":"application/json" },
                 body: JSON.stringify({ name: dispName, message: text })
               });
-
-              let resp = {};
-              try { resp = await rr.json(); } catch(_) {}
-
+              let resp = {}; try { resp = await rr.json(); } catch(_) {}
               if (!rr.ok){
                 alert(`Send failed (${rr.status}): ${resp.error || resp.reason || 'unknown'}`);
                 console.warn('followup error details:', resp);
                 return;
               }
-
               localStorage.setItem("ns_display_name", dispName);
-              ib.style.display='none';
-              ta.value="";
-              loadComments();
-            }catch(err){
-              alert("Network error");
-              console.error(err);
-            }
+              ib.style.display='none'; ta.value="";
+              fetchAll(true); // bg refresh
+            }catch(err){ alert("Network error"); console.error(err); }
           });
+
+          // owner edit/del
+          if (owned.includes(c.id)) {
+            body.querySelector('[data-action="del"]')?.addEventListener('click', (e)=> deleteThread(e, c.id, false));
+            body.querySelector('[data-action="edit"]')?.addEventListener('click', async (e)=>{
+              e.stopPropagation();
+              const cur = prompt("Edit your message:", c.message||"");
+              if (cur==null) return;
+              const txt = String(cur).trim(); if (!txt) return;
+              const rr = await fetch(`${API}/${c.id}`, {
+                method:"PATCH",
+                headers:{ "Content-Type":"application/json", "Authorization": `Bearer owner:${OWNER_TOKEN}` },
+                body: JSON.stringify({ message: txt })
+              });
+              if (!rr.ok){ alert("Edit failed"); return; }
+              fetchAll(true);
+            });
+          }
         }
-      });
-    }catch(e){ console.error(e); }
+      } // fin par fil
+    });
+
+    // swap dans le DOM en une fois (perf)
+    const list = document.getElementById('list');
+    requestAnimationFrame(()=>{ list.innerHTML = ""; list.appendChild(frag); });
   }
 
-  // init + admin verify then load
+  function bubbleUser(name, msg){
+    return `<div class="bubble-row user"><div class="bubble user">
+              <span class="who">${escapeHtml(name||'Anonymous')}</span>
+              ${linkify(escapeHtml(msg||''))}
+            </div></div>`;
+  }
+  function bubbleDev(name, msg){
+    return `<div class="bubble-row dev"><div class="bubble dev">
+              <span class="who">${escapeHtml(name||'Anatomie Sonore')}</span>
+              ${linkify(escapeHtml(msg||''))}
+            </div></div>`;
+  }
+
+  async function deleteThread(e, id, asAdmin){
+    e?.stopPropagation?.();
+    if (!confirm('Delete this thread?')) return;
+    const headers = asAdmin
+      ? { "Authorization":`Bearer ${ADMIN_TOKEN}` }
+      : { "Authorization": `Bearer owner:${OWNER_TOKEN}` };
+    const rr = await fetch(`${API}/${id}`, { method:"DELETE", headers });
+    if (!rr.ok){ alert("Delete failed"); return; }
+    if (!asAdmin){
+      const arr = JSON.parse(localStorage.getItem(OWNED_KEY)||"[]").filter(x=>x!==id);
+      localStorage.setItem(OWNED_KEY, JSON.stringify(arr));
+    }
+    // retire du cache local instantanément
+    if (CACHE.all) CACHE.all = CACHE.all.filter(x=>x.id !== id);
+    render(CACHE.all||[]);
+    fetchAll(true);
+  }
+
   (async ()=>{
     if (isAdmin()) {
       try {
@@ -476,10 +462,9 @@
         if (!ok) { ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token"); refreshAdminUI(); }
       } catch {}
     }
-    // préremplir le champ name du formulaire avec la dernière valeur connue
     const lastName = localStorage.getItem("ns_display_name");
     if (lastName) document.getElementById('name').value = lastName;
-    loadComments();
+    fetchAll(true);
   })();
 </script>
 </body>
