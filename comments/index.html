@@ -296,17 +296,41 @@
             if (!box) return;
             box.style.display='none'; ta.value="";
           });
-          wrap.querySelector('[data-action="send-user"]')?.addEventListener('click', async ()=>{
-            if (!box) return;
-            const text = (ta.value||"").trim(); if (!text) return;
-            const rr = await fetch(`${API}/${c.id}/followup`, {
-              method:"POST",
-              headers:{ "Content-Type":"application/json" },
-              body: JSON.stringify({ name: document.getElementById('name').value.trim().slice(0,40), message: text })
-            });
-            if (!rr.ok){ alert("Send failed"); return; }
-            loadComments();
-          });
+         wrap.querySelector('[data-action="send-user"]')?.addEventListener('click', async ()=>{
+  if (!box) return;
+  const text = (ta.value||"").trim();
+  if (!text) return;
+
+  try{
+    const rr = await fetch(`${API}/${c.id}/followup`, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({
+        name: document.getElementById('name')?.value.trim().slice(0,40) || "Anonymous",
+        message: text
+      })
+    });
+
+    let respJson = {};
+    try { respJson = await rr.json(); } catch(_) {}
+
+    if (!rr.ok){
+      // te montre VRAIMENT la cause : 404 / 429 / 500 + message renvoyé par le worker
+      alert(`Send failed (${rr.status}): ${respJson.error || respJson.reason || 'unknown'}`);
+      console.warn('followup error details:', respJson);
+      return;
+    }
+
+    // succès
+    box.style.display = 'none';
+    ta.value = "";
+    loadComments();
+  }catch(e){
+    alert("Network error");
+    console.error(e);
+  }
+});
+
 
           // owner edit/del
           wrap.querySelector('[data-action="del"]')?.addEventListener('click', async ()=>{
