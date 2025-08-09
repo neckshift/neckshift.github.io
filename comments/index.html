@@ -39,13 +39,45 @@
     }
 
     form { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
-    input, select, textarea {
+    input, textarea {
       background: rgba(44,44,44,0.25);
       border: 1px solid rgba(255,255,255,0.25);
       color: #eee; padding: 10px; border-radius: 8px; font-size: 15px;
     }
     input::placeholder, textarea::placeholder { color:#bbb; }
-    input:focus, select:focus, textarea:focus { outline:none; border-color: rgba(255,255,255,0.45); background: rgba(44,44,44,0.35); }
+    input:focus, textarea:focus { outline:none; border-color: rgba(255,255,255,0.45); background: rgba(44,44,44,0.35); }
+
+    /* ===== Select (topic) transparent + flou & flèche masquée ===== */
+    select {
+      background: rgba(33,33,33,0.4);              /* semi-transparent */
+      backdrop-filter: blur(4px);                  /* flou derrière */
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #B3A8A8;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 15px;
+      appearance: none;                             /* masque le style/flèche par défaut */
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: none !important;            /* évite le caret clair */
+      position: relative;
+    }
+    /* Vieilles versions Edge/IE: masque la flèche */
+    select::-ms-expand { display: none; }
+
+    select:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.45);
+      background: rgba(33,33,33,0.5);              /* un poil plus sombre au focus */
+    }
+
+    /* Liste des options (quand le menu est ouvert) — support variable selon navigateurs */
+    select option {
+      background-color: rgba(20,20,20,0.95);       /* fond sombre quasi opaque */
+      color: #BEBEBE;
+    }
+
     button {
       background: none; color: #AA9E9E; border-radius: 8px; font-size: 16px; border: 1px solid #888; padding: 10px; cursor:pointer;
       transition: all 0.3s ease;
