@@ -35,7 +35,7 @@
   .tab[data-topic="feature"].active{color:#111;background:var(--blue);border-color:var(--blue)}
   .tab[data-topic="bug"].active{color:#111;background:var(--red);border-color:var(--red)}
 
-  /* Le formulaire n’est plus dans la zone sticky */
+  /* Le formulaire n’est plus sticky */
   .panel{margin-top:14px;background:var(--glass);border:1px solid var(--line);border-radius:16px}
   .form{padding:12px;border-bottom:1px solid var(--line)}
   .row{display:grid;grid-template-columns:1fr;gap:10px}
@@ -67,15 +67,15 @@
   .thread-body{display:none;padding:0 10px 12px}
   .thread.open .thread-body{display:block}
 
-  /* Bulles style SMS plus fines (moins hautes) */
+  /* Bulles “SMS” partout, largeur fixe ~78% */
   .bubble-row{display:flex;width:100%;margin-top:8px}
   .bubble-row.user{justify-content:flex-start}
   .bubble-row.dev{justify-content:flex-end}
   .bubble{
-    max-width:78%;
-    padding:8px 10px;              /* <- plus fin */
+    width:78%;                /* <-- largeur fixe */
+    padding:8px 10px;         /* plus fin */
     border-radius:14px;
-    line-height:1.4;               /* <- plus serré */
+    line-height:1.4;          /* plus serré */
     font-size:15px;
     box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
     word-wrap:break-word;overflow-wrap:anywhere;
@@ -89,20 +89,13 @@
   .inlinebox textarea{width:100%;min-height:72px}
   .inlinebox .row2{display:flex;gap:8px;align-items:center;margin-top:6px}
   .inlinebox input[type="text"]{width:200px}
-
-  /* Petit écran : resserrer encore un peu */
-  @media (max-width: 480px){
-    .bubble{max-width:82%; padding:7px 9px; font-size:14.5px; line-height:1.38}
-    .who{font-size:1rem}
-    textarea{min-height:90px}
-  }
 </style>
 </head>
 <body>
   <div class="background"><img src="../createbackground.png" alt=""></div>
 
   <div class="wrap">
-    <!-- STICKY: juste header + tabs -->
+    <!-- STICKY: header + tabs -->
     <div class="sticky">
       <div class="head">
         <h2>Comments</h2>
@@ -173,7 +166,6 @@
         btn.classList.add("active");
         currentTopic = btn.getAttribute("data-topic");
         loadComments();
-        // scroll to top of panel to laisser de la place aux messages
         document.querySelector('.panel').scrollIntoView({ behavior:'smooth', block:'start' });
       };
     })(tabEls[i]));
@@ -450,7 +442,7 @@
             var cur = prompt("Edit your message:", c.message||"");
             if (cur==null) return;
             var txt = String(cur).trim(); if (!txt) return;
-            fetch(API+'/'+c.id', {
+            fetch(API+'/'+c.id, {
               method:"PATCH",
               headers:{ "Content-Type":"application/json", "Authorization":"Bearer owner:'+OWNER_TOKEN+'" },
               body: JSON.stringify({ message: txt })
