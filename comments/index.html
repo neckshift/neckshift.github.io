@@ -1,404 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NeckShift - Comments</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #212121;
-      color: #B3A8A8;
-      text-align: center;
-      line-height: 1.8;
-      font-size: 16px;
-    }
-    .background { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
-    .background img {
-      width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4);
-      pointer-events: none; user-select: none;
-    }
-    .container {
-      max-width: 800px; margin: 40px auto; padding: 20px;
-      background-color: rgba(48,48,48,0.6);
-      border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.1); text-align: left;
-    }
-    .topbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:8px; }
-    .btn-small {
-      border:1px solid #888; color:#AA9E9E; background:none; border-radius:8px; padding:6px 10px; cursor:pointer;
-    }
-    .btn-small:hover { background:#555; color:#fff; }
-    h2 { color:#AA9E9E; margin: 8px 0; }
-    p.note { color:#AA9E9E; margin-top:-6px; text-align:center; }
-
-    #adminPanel { display:none; gap:8px; align-items:center; }
-    #adminPanel input {
-      background:#2c2c2c; color:#ddd; border:1px solid #888; border-radius:8px; padding:6px 8px;
-    }
-
-    form { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
-    input, textarea {
-      background: rgba(44,44,44,0.25);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: #eee; padding: 10px; border-radius: 8px; font-size: 15px;
-    }
-    input::placeholder, textarea::placeholder { color:#bbb; }
-    input:focus, textarea:focus { outline:none; border-color: rgba(255,255,255,0.45); background: rgba(44,44,44,0.35); }
-
-    /* ===== Select (topic) transparent + flou & flèche masquée ===== */
-    select {
-      background: rgba(33,33,33,0.4);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: #B3A8A8;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 15px;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: none !important;
-      position: relative;
-    }
-    select::-ms-expand { display: none; }
-    select:focus {
-      outline: none;
-      border-color: rgba(255,255,255,0.45);
-      background: rgba(33,33,33,0.5);
-    }
-    select option {
-      background-color: rgba(20,20,20,0.95);
-      color: #BEBEBE;
-    }
-
-    button {
-      background: none; color: #AA9E9E; border-radius: 8px; font-size: 16px; border: 1px solid #888; padding: 10px; cursor:pointer;
-      transition: all 0.3s ease;
-    }
-    button:hover { background:#555; color:#fff; }
-    .status { min-height:22px; font-size:14px; color:#d9bebe; }
-
-    .comment {
-      background: rgba(44,44,44,0.40); padding: 12px; border-radius: 10px; margin-top: 14px; border: 1px solid rgba(255,255,255,0.10);
-      position: relative;
-    }
-    .meta { font-size: 13px; color: #8f8f8f; margin-bottom: 6px; }
-    .reply {
-      margin-top: 10px; padding: 10px; border-left: 3px solid #8aa; background: rgba(255,255,255,0.05); border-radius: 8px;
-    }
-    .admin-actions { position:absolute; top:8px; right:8px; display:flex; gap:6px; }
-    .admin-actions button { padding:4px 8px; font-size:12px; border-radius:6px; }
-
-    /* zone de réponse inline */
-    .replybox { display:none; margin-top:10px; }
-    .replybox textarea { width:100%; min-height:80px; }
-    .replybox .actions { display:flex; gap:8px; margin-top:6px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NeckShift - Comments</title>
+<style>
+  :root {
+    --fg:#E9E3E3; --muted:#B3A8A8; --border:rgba(255,255,255,0.12);
+    --bg:#212121; --card:rgba(48,48,48,0.6);
+    --accent:#8fd; --danger:#f88; --ok:#9ef0d0;
+  }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--muted); }
+  .background{ position:fixed; inset:0; z-index:-1; overflow:hidden }
+  .background img{ width:100%; height:100%; object-fit:cover; filter:brightness(.35) }
+  .container{ max-width:860px; margin:24px auto; padding:0 16px; }
+  .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .header{ display:flex; gap:12px; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+  h2{ margin:0; color:#d9cfcf; font-weight:600; }
+  .top-actions{ display:flex; gap:10px; align-items:center; }
+  .btn{ border:1px solid #888; background:none; color:var(--muted); border-radius:8px; padding:8px 12px; cursor:pointer; }
+  .btn:hover{ background:#555; color:#fff }
+  .btn-small{ padding:6px 10px; border-radius:8px; }
+  .sticky-form{ position:sticky; top:0; z-index:5; background:rgba(33,33,33,0.9); border-bottom:1px solid var(--border); }
+  form{ display:grid; gap:10px; grid-template-columns: 1fr 1fr; padding:14px 18px; }
+  form .row-full{ grid-column:1/-1 }
+  input, textarea, select{
+    background: rgba(44,44,44,0.25); border:1px solid rgba(255,255,255,0.25); color:#eee; padding:10px; border-radius:10px; font-size:15px;
+  }
+  textarea{ min-height:96px; }
+  label.inline{ display:flex; gap:8px; align-items:center; font-size:14px; color:#cfc6c6 }
+  .status{ min-height:22px; font-size:14px; color:#d9bebe; padding:0 18px 12px }
+  #list-wrap{ max-height:70vh; overflow:auto; padding:12px 18px 20px }
+  .comment{ background: rgba(44,44,44,0.40); border:1px solid var(--border); border-radius:12px; padding:12px; margin-top:14px; position:relative }
+  .comment[data-highlight="1"]{ outline:2px solid rgba(143,253,218,.35) }
+  .meta{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:13px; color:#9a9a9a; margin-bottom:6px }
+  .name{ color:#f0eded; font-weight:600 }
+  time{ color:#b0b0b0; font-size:12px }
+  .badge{ font-size:12px; padding:2px 6px; border-radius:6px; border:1px solid rgba(255,255,255,.2) }
+  .badge-admin{ background: rgba(0,160,120,.15); border-color: rgba(0,160,120,.4); color:#9ef0d0 }
+  .badge-unverified{ background: rgba(160,160,160,.1); border-color: rgba(160,160,160,.3); color:#cfcfcf }
+  .badge-topic{ background: rgba(90,120,160,.12); border-color: rgba(90,120,160,.3) }
+  .reply{ margin-top:10px; padding:10px; border-left:3px solid #5bb; background: rgba(120,180,200,.08); border-radius:8px }
+  .admin-actions{ position:absolute; top:8px; right:8px; display:flex; gap:6px }
+  .replybox{ display:none; margin-top:10px }
+  .replybox textarea{ width:100%; min-height:80px }
+  .replybox .actions{ display:flex; gap:8px; margin-top:6px }
+</style>
 </head>
 <body>
-  <div class="background">
-    <img src="../createbackground.png" alt="Background">
-  </div>
+  <div class="background"><img src="../createbackground.png" alt=""></div>
 
   <div class="container">
-    <div class="topbar">
-      <h2 style="margin:0; color:#AA9E9E;">Comments</h2>
-
-      <!-- Bouton + panneau admin (password masqué) -->
-      <div style="display:flex; gap:10px; align-items:center; margin-left:auto;">
-        <button id="adminToggle" class="btn-small" title="Enter admin password to moderate">Admin mode</button>
-        <div id="adminPanel">
-          <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off">
-          <button id="adminUse" class="btn-small">Use</button>
-          <button id="adminCancel" class="btn-small">Cancel</button>
+    <div class="card sticky-form">
+      <div class="header">
+        <h2>Comments</h2>
+        <div class="top-actions">
+          <button id="adminToggle" class="btn btn-small" title="Enter admin password">Admin mode</button>
+          <div id="adminPanel" style="display:none; gap:8px; align-items:center">
+            <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
+            <button id="adminUse" class="btn btn-small">Use</button>
+            <button id="adminCancel" class="btn btn-small">Cancel</button>
+          </div>
         </div>
       </div>
+
+      <form id="commentForm" autocomplete="off" autocapitalize="off" autocorrect="off">
+        <input class="row-full" type="text" id="name" placeholder="Your name (optional)" maxlength="40">
+        <select id="topic">
+          <option value="thanks">Thanks</option>
+          <option value="feature">Feature request</option>
+          <option value="bug">Bug report</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="email" id="email" placeholder="Email (optional, for reply notification)">
+        <textarea class="row-full" id="message" placeholder="Write your comment..." maxlength="1500" required></textarea>
+        <label class="inline"><input type="checkbox" id="notify" checked> Notify me when there’s a reply</label>
+        <button class="row-full btn" type="submit">Post comment</button>
+      </form>
+      <div id="status" class="status" aria-live="polite"></div>
     </div>
 
-    <p class="note">Share thanks, ideas or bug reports.</p>
-
-    <form id="commentForm" autocomplete="off" autocapitalize="off" autocorrect="off">
-      <input type="text" id="name" name="ns-name" placeholder="Your name (optional)" maxlength="40"
-             autocomplete="off" autocapitalize="off" autocorrect="off">
-      <select id="topic">
-        <option value="thanks">Thanks</option>
-        <option value="feature">Feature request</option>
-        <option value="bug">Bug report</option>
-        <option value="other">Other</option>
-      </select>
-      <textarea id="message" placeholder="Write your comment..." rows="4" maxlength="1500" required></textarea>
-
-      <!-- Turnstile invisible -->
-      <div class="cf-turnstile"
-           data-sitekey="0x4AAAAAABpxVooBfvzHUFKr"
-           data-theme="dark"
-           data-size="normal"
-           data-callback="onTurnstileOk"></div>
-
-      <button type="submit">Post comment</button>
-      <div id="status" class="status" aria-live="polite"></div>
-    </form>
-
-    <h3 style="color:#AA9E9E;margin-top:24px;">Recent comments</h3>
-    <div id="list"></div>
+    <div id="list-wrap" class="card">
+      <div id="list" style="padding-bottom:10px"></div>
+    </div>
   </div>
 
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <script>
-    // ⚠️ Remplace API_BASE si tu changes de domaine Worker
-    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
-    const API = API_BASE + "/comments";
+<script>
+  const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
+  const API = API_BASE + "/comments";
 
-    // Admin token stocké uniquement en session de l’onglet
-    let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
-    const isAdminActive = () => !!ADMIN_TOKEN;
+  let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
+  const isAdminActive = () => !!ADMIN_TOKEN;
 
-    // Turnstile invisible
-    let turnstileReady = false;
-    window.onTurnstileOk = function(){ turnstileReady = true; };
+  function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+  function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
 
-    function escapeHtml(s){return (s||"").replace(/[&<>\"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
-    function linkify(s){return (s||"").replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');}
+  // Admin panel
+  const adminBtn=document.getElementById("adminToggle");
+  const adminPanel=document.getElementById("adminPanel");
+  const adminPwd=document.getElementById("adminPassword");
+  const adminUse=document.getElementById("adminUse");
+  const adminCancel=document.getElementById("adminCancel");
 
-    // ----- Admin panel (password masked)
-    const adminBtn   = document.getElementById("adminToggle");
-    const adminPanel = document.getElementById("adminPanel");
-    const adminPwd   = document.getElementById("adminPassword");
-    const adminUse   = document.getElementById("adminUse");
-    const adminCancel= document.getElementById("adminCancel");
-
-    function refreshAdminButton(){
-      adminBtn.textContent = isAdminActive() ? "Admin mode: ON" : "Admin mode";
-      adminBtn.style.color = isAdminActive() ? "#9fd" : "";
-      adminPanel.style.display = "none"; // refermer le panneau
+  function refreshAdminUI(){
+    adminBtn.textContent = isAdminActive() ? "Admin mode: ON" : "Admin mode";
+    adminBtn.style.color = isAdminActive() ? "#9fd" : "";
+    adminPanel.style.display = "none";
+  }
+  adminBtn.addEventListener("click", ()=>{
+    if (isAdminActive()){
+      if (confirm("Disable admin mode?")) {
+        ADMIN_TOKEN = "";
+        sessionStorage.removeItem("ns_admin_token");
+        refreshAdminUI(); loadComments();
+      }
+    } else {
+      adminPanel.style.display="flex"; adminPwd.value=""; adminPwd.focus();
     }
+  });
+  adminUse.addEventListener("click", async ()=>{
+    const t = adminPwd.value.trim(); if (!t) return;
+    const resp = await fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":`Bearer ${t}` } });
+    const ok = resp.ok && (await resp.json().catch(()=>({ok:false}))).ok;
+    if (!ok) { alert("Wrong password"); return; }
+    ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
+    refreshAdminUI(); loadComments();
+  });
+  adminCancel.addEventListener("click", ()=>{ adminPanel.style.display="none"; adminPwd.value=""; });
+  refreshAdminUI();
 
-    adminBtn.addEventListener("click", ()=>{
-      if (isAdminActive()) {
-        if (confirm("Disable admin mode?")) {
-          ADMIN_TOKEN = "";
-          sessionStorage.removeItem("ns_admin_token");
-          refreshAdminButton();
-          loadComments();
-        }
-      } else {
-        adminPanel.style.display = "flex";
-        adminPwd.value = "";
-        adminPwd.focus();
-      }
-    });
+  // Submit (avec email/notify)
+  document.getElementById('commentForm').addEventListener('submit', async (e)=>{
+    e.preventDefault(); const st=document.getElementById('status'); st.textContent="";
 
-    // ✅ Vérification côté serveur avant d'activer l'admin
-    adminUse.addEventListener("click", async ()=>{
-      const t = adminPwd.value.trim();
-      if (!t) return;
+    const name=document.getElementById('name').value.trim().slice(0,40);
+    const topic=document.getElementById('topic').value;
+    const message=document.getElementById('message').value.trim();
+    const email=document.getElementById('email').value.trim();
+    const notify=document.getElementById('notify').checked;
 
-      const resp = await fetch(API_BASE + "/admin/verify", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${t}` }
+    if (!message || message.length<2) { st.textContent="Message is too short."; return; }
+
+    try{
+      const r = await fetch(API, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ name, topic, message, email, notify })
       });
-
-      if (!resp.ok) {
-        alert("Wrong password. Admin mode not enabled.");
+      const data = await r.json().catch(()=>null);
+      if (!r.ok) {
+        st.textContent =
+          data?.error === 'invalid_email' ? "Invalid email." :
+          data?.error === 'rate_limited' ? "Please wait a minute before posting again." :
+          data?.error === 'invalid_topic' ? "Invalid topic." :
+          "Sorry, something went wrong.";
         return;
       }
-      const data = await resp.json().catch(()=>({ok:false}));
-      if (!data.ok) {
-        alert("Wrong password. Admin mode not enabled.");
-        return;
-      }
-
-      ADMIN_TOKEN = t;
-      sessionStorage.setItem("ns_admin_token", ADMIN_TOKEN);
-      refreshAdminButton();
+      st.textContent="Thanks! Your comment was posted.";
+      e.target.reset();
       loadComments();
-    });
+    } catch(err) {
+      console.error(err); st.textContent="Network error. Please try again.";
+    }
+  });
 
-    adminCancel.addEventListener("click", ()=>{
-      adminPanel.style.display = "none";
-      adminPwd.value = "";
-    });
+  // load + render
+  async function loadComments(){
+    try{
+      const r = await fetch(API);
+      const data = await r.json();
+      const list = document.getElementById('list');
+      list.innerHTML="";
 
-    refreshAdminButton();
+      (data||[]).forEach(c=>{
+        const when = new Date(c.created_at||Date.now()).toLocaleString();
+        const wrap = document.createElement('div');
+        wrap.className='comment';
+        wrap.dataset.id = c.id;
+        wrap.id = `c-${c.id}`;
 
-    // ✅ Vérifier un token déjà en session au chargement
-    (async () => {
-      if (!ADMIN_TOKEN) { loadComments(); return; }
-      try {
-        const resp = await fetch(API_BASE + "/admin/verify", {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${ADMIN_TOKEN}` }
-        });
-        if (!resp.ok) {
-          ADMIN_TOKEN = "";
-          sessionStorage.removeItem("ns_admin_token");
-          refreshAdminButton();
-        } else {
-          const data = await resp.json().catch(()=>({ok:false}));
-          if (!data.ok) {
-            ADMIN_TOKEN = "";
-            sessionStorage.removeItem("ns_admin_token");
-            refreshAdminButton();
-          }
+        const isOfficial = false; // auteur utilisateur (pas admin)
+        const meta =
+          `<div class="meta">
+             <span class="name">${escapeHtml(c.name || 'Anonymous')}</span>
+             ${isOfficial ? '<span class="badge badge-admin">Officiel</span>' : '<span class="badge badge-unverified">Non vérifié</span>'}
+             ${c.notify ? '<span class="badge" title="They asked to be notified">🔔</span>' : ''}
+             <span class="badge badge-topic">${escapeHtml(c.topic || 'other')}</span>
+             <time>${when}</time>
+           </div>`;
+
+        let html = meta + `<div>${linkify(escapeHtml(c.message || ''))}</div>`;
+
+        // replies (array) ou compat ancienne
+        if (Array.isArray(c.replies) && c.replies.length) {
+          c.replies.forEach(r=>{
+            html += `<div class="reply"><strong>${escapeHtml(r.by || 'Dev')}</strong><br>${linkify(escapeHtml(r.message||''))}
+                     <div class="meta" style="margin-top:6px;"><time>${new Date(r.created_at||Date.now()).toLocaleString()}</time></div></div>`;
+          });
+        } else if (c.reply && c.reply.message) {
+          html += `<div class="reply"><strong>${escapeHtml(c.reply.by || 'Dev')}</strong><br>${linkify(escapeHtml(c.reply.message||''))}</div>`;
         }
-      } catch (e) {
-        console.warn("Admin verify failed:", e);
-        // on ne casse pas l'affichage publique
-      }
-      loadComments();
-    })();
-
-    // ----- Liste des commentaires (avec reply inline pour admin)
-    async function loadComments(){
-      try{
-        const r = await fetch(API);
-        const data = await r.json();
-        const list = document.getElementById('list');
-        list.innerHTML = "";
-        (data||[]).forEach(c=>{
-          const when = new Date(c.created_at||Date.now()).toLocaleString();
-          const el = document.createElement('div');
-          el.className = 'comment';
-          el.dataset.id = c.id;
-
-          let html =
-            `<div class="meta">${escapeHtml(c.name || 'Anonymous')} • ${when} • ${escapeHtml(c.topic || 'other')}</div>` +
-            `<div>${linkify(escapeHtml(c.message || ''))}</div>`;
-
-          if (c.reply && c.reply.message) {
-            html += `<div class="reply"><strong>${escapeHtml(c.reply.by || 'Dev')}</strong><br>${linkify(escapeHtml(c.reply.message))}</div>`;
-          }
-
-          if (isAdminActive()) {
-            html += `<div class="admin-actions">
-                       <button class="btn-small" data-action="reply">Reply</button>
-                       <button class="btn-small" data-action="delete">Delete</button>
-                     </div>
-                     <div class="replybox">
-                       <textarea placeholder="Write a dev reply…"></textarea>
-                       <div class="actions">
-                         <button class="btn-small" data-action="send-reply">Send</button>
-                         <button class="btn-small" data-action="cancel-reply">Cancel</button>
-                       </div>
-                     </div>`;
-          }
-
-          el.innerHTML = html;
-          list.appendChild(el);
-        });
 
         if (isAdminActive()) {
-          document.querySelectorAll('.comment').forEach(wrap=>{
-            const id = wrap.dataset.id;
-            const actions = wrap.querySelector('.admin-actions');
-            const box = wrap.querySelector('.replybox');
-            if (!actions || !box) return;
+          html += `<div class="admin-actions">
+                     <button class="btn btn-small" data-action="reply">Reply</button>
+                     <button class="btn btn-small" data-action="delete">Delete</button>
+                   </div>
+                   <div class="replybox">
+                     <textarea placeholder="Write a dev reply…"></textarea>
+                     <div class="actions">
+                       <button class="btn btn-small" data-action="send-reply">Send</button>
+                       <button class="btn btn-small" data-action="cancel-reply">Cancel</button>
+                     </div>
+                   </div>`;
+        }
 
-            const btnReply  = actions.querySelector('[data-action="reply"]');
-            const btnDelete = actions.querySelector('[data-action="delete"]');
-            const btnSend   = box.querySelector('[data-action="send-reply"]');
-            const btnCancel = box.querySelector('[data-action="cancel-reply"]');
-            const textarea  = box.querySelector('textarea');
+        wrap.innerHTML = html;
+        list.appendChild(wrap);
+      });
 
-            btnReply.addEventListener('click', ()=>{
-              box.style.display = 'block';
-              textarea.value = '';
-              textarea.focus();
+      if (isAdminActive()) {
+        document.querySelectorAll('.comment').forEach(wrap=>{
+          const id = wrap.dataset.id;
+          const actions = wrap.querySelector('.admin-actions');
+          const box = wrap.querySelector('.replybox');
+          if (!actions || !box) return;
+
+          const btnReply  = actions.querySelector('[data-action="reply"]');
+          const btnDelete = actions.querySelector('[data-action="delete"]');
+          const btnSend   = box.querySelector('[data-action="send-reply"]');
+          const btnCancel = box.querySelector('[data-action="cancel-reply"]');
+          const textarea  = box.querySelector('textarea');
+
+          btnReply.addEventListener('click', ()=>{ box.style.display='block'; textarea.value=''; textarea.focus(); });
+          btnCancel.addEventListener('click', ()=>{ box.style.display='none'; textarea.value=''; });
+
+          btnSend.addEventListener('click', async ()=>{
+            const text = (textarea.value || '').trim(); if (!text) return;
+            const rr = await fetch(`${API}/${id}/reply`, {
+              method:"POST",
+              headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${ADMIN_TOKEN}` },
+              body: JSON.stringify({ reply: text })
             });
-
-            btnCancel.addEventListener('click', ()=>{
-              box.style.display = 'none';
-              textarea.value = '';
-            });
-
-            btnSend.addEventListener('click', async ()=>{
-              const text = (textarea.value || '').trim();
-              if (!text) return;
-              const rr = await fetch(`${API}/${id}/reply`, {
-                method: "POST",
-                headers: {
-                  "Content-Type":"application/json",
-                  "Authorization": `Bearer ${ADMIN_TOKEN}`
-                },
-                body: JSON.stringify({ reply: text })
-              });
-              if(!rr.ok){ alert("Reply failed"); return; }
-              loadComments();
-            });
-
-            btnDelete.addEventListener('click', async ()=>{
-              if (!confirm('Delete this comment?')) return;
-              const rr = await fetch(`${API}/${id}`, {
-                method: "DELETE",
-                headers: { "Authorization": `Bearer ${ADMIN_TOKEN}` }
-              });
-              if(!rr.ok){ alert("Delete failed"); return; }
-              loadComments();
-            });
+            if (!rr.ok) { alert("Reply failed"); return; }
+            loadComments();
           });
-        }
-      }catch(e){
-        console.error(e);
-      }
-    }
 
-    // ----- Submit public
-    document.getElementById('commentForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const statusEl = document.getElementById('status');
-      statusEl.textContent = "";
-
-      if (window.turnstile && !turnstile.getResponse()) {
-        await new Promise(resolve => {
-          const t = setInterval(() => {
-            if (turnstileReady) { clearInterval(t); resolve(); }
-          }, 50);
-          try { turnstile.execute(); } catch(e) {}
+          btnDelete.addEventListener('click', async ()=>{
+            if (!confirm('Delete this comment?')) return;
+            const rr = await fetch(`${API}/${id}`, {
+              method:"DELETE",
+              headers:{ "Authorization":`Bearer ${ADMIN_TOKEN}` }
+            });
+            if (!rr.ok) { alert("Delete failed"); return; }
+            loadComments();
+          });
         });
       }
-      const token = (window.turnstile && window.turnstile.getResponse) ? window.turnstile.getResponse() : "";
 
-      const name = document.getElementById('name').value.trim().slice(0,40);
-      const topic = document.getElementById('topic').value;
-      const message = document.getElementById('message').value.trim();
-
-      if (!message || message.length < 2) { statusEl.textContent = "Message is too short."; return; }
-      if (!token) { statusEl.textContent = "Please complete the verification."; return; }
-
-      try{
-        const r = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type":"application/json" },
-          body: JSON.stringify({ name, topic, message, token })
-        });
-
-        if(!r.ok){
-          const err = await r.json().catch(()=>({error:'unknown'}));
-          statusEl.textContent =
-            err.error === 'reserved_name' ? "That name is reserved." :
-            err.error === 'banned_word'   ? "Your message contains blocked terms." :
-            err.error === 'captcha_failed'? "Verification failed." :
-            err.error === 'rate_limited'  ? "Please wait a bit before posting again." :
-            "Sorry, something went wrong.";
-          if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
-          return;
+      // si on vient d'une notif Discord ?cid=...
+      const url = new URL(location.href);
+      const cid = url.searchParams.get('cid');
+      if (cid) {
+        const el = document.querySelector(`.comment[data-id="${cid}"]`);
+        if (el) {
+          el.dataset.highlight = "1";
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (isAdminActive()) {
+            const btn = el.querySelector('.admin-actions [data-action="reply"]');
+            btn && btn.click();
+          }
         }
-
-        statusEl.textContent = "Thanks! Your comment was posted.";
-        e.target.reset();
-        if (window.turnstile && window.turnstile.reset) window.turnstile.reset();
-        loadComments();
-      }catch(e){
-        console.error(e);
-        statusEl.textContent = "Network error. Please try again.";
       }
-    });
+    } catch(e) { console.error(e); }
+  }
 
-    // Premier chargement
-    // (la vérif admin se fait dans l'IIFE plus haut, puis on appelle loadComments())
-  </script>
+  // on vérifie un token admin existant
+  (async ()=>{
+    if (!ADMIN_TOKEN) return loadComments();
+    try {
+      const r = await fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":`Bearer ${ADMIN_TOKEN}` } });
+      const ok = r.ok && (await r.json().catch(()=>({ok:false}))).ok;
+      if (!ok) { ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token"); refreshAdminUI(); }
+    } catch {}
+    loadComments();
+  })();
+</script>
 </body>
 </html>
