@@ -64,22 +64,24 @@
       color: var(--muted);
     }
 
-    /* Download buttons – subtle, distinct from other buttons */
+    /* Download buttons – full-width like paragraphs, transparent base */
     .download-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      width: 300px;
+      width: 100%;
+      max-width: 80ch;           /* aligné avec la largeur des paragraphes */
       height: 70px;
       background: var(--btn-bg);
       color: var(--btn-text);
+      opacity: 0.3;              /* 30% d’opacité au repos */
       text-decoration: none;
       border-radius: 12px;
       text-align: center;
       font-size: 18px;
       border: 1.5px solid var(--btn-border);
-      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
       cursor: pointer;
       font-weight: 600;
       letter-spacing: .2px;
@@ -87,6 +89,7 @@
     .download-button:hover {
       background: var(--btn-bg-hover);
       border-color: #9a9a9a;
+      opacity: 1;                /* opaque au survol */
       transform: translateY(-1px);
     }
     .download-button .sub {
@@ -173,23 +176,13 @@
       }
 
       .download-button {
-        width: 240px !important;
         height: 60px !important;
         font-size: 17px !important;
       }
 
-      .section h2 {
-        text-align: center;
-      }
-
-      .section p {
-        text-align: left;
-        padding: 0 10px;
-      }
-
-      .section-title {
-        text-align: center !important;
-      }
+      .section h2 { text-align: center; }
+      .section p { text-align: left; padding: 0 10px; }
+      .section-title { text-align: center !important; }
     }
 
     .section-title { text-align: left; }
@@ -218,7 +211,7 @@
     <div style="background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 40px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);">
       
       <!-- Top / Hero -->
-      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px;">
+      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px; flex-wrap: wrap;">
         <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888;">
         <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 20px; align-items: center; flex: 1;">
           <!-- Windows -->
@@ -240,7 +233,10 @@
         </div>
       </div>
 
-      <!-- MENU LINE placed ABOVE the first separator, before "What is NeckShift" -->
+      <!-- Separator moved JUST BELOW the download buttons -->
+      <hr style="border: none; border-top: 1px solid var(--line); margin: 24px 0 8px;">
+
+      <!-- MENU LINE (still before the title) -->
       <div class="menu-bar">
         <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
         <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
@@ -253,7 +249,7 @@
 
       <!-- CONTENT -->
       <div>
-        <hr style="border: none; border-top: 1px solid var(--line); margin: 24px 0 40px;">
+        <!-- plus de HR ici, le liseret est désormais au-dessus du menu -->
 
         <!-- English content (default) -->
         <div id="content-en">
@@ -280,7 +276,7 @@
           <p>It now feels stable, clear, and useful enough to share. Please send feedback, suggestions, or report any issues on the comments page.</p>
         </div>
 
-        <!-- French content (exact original text) -->
+        <!-- French content (original) -->
         <div id="content-fr" style="display:none;">
           <h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
           <p>NeckShift est un logiciel gratuit conçu pour explorer le manche via des selections de notes et de gammes associées, le tout de façon interactive.</p>
@@ -317,7 +313,6 @@
 
   <script>
     function setLang(lang){
-      // Toggle content blocks
       const en = document.getElementById('content-en');
       const fr = document.getElementById('content-fr');
       const footEn = document.getElementById('foot-en');
@@ -342,11 +337,9 @@
         btnFr.classList.remove('active');
         btnEn.classList.add('active');
       }
-      // Persist choice (optional)
       try { localStorage.setItem('ns_lang', lang); } catch(e){}
     }
 
-    // init language from storage
     (function(){
       let lang = 'en';
       try { lang = localStorage.getItem('ns_lang') || 'en'; } catch(e){}
