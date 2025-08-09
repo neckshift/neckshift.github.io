@@ -49,32 +49,28 @@
 
     /* ===== Select (topic) transparent + flou & flèche masquée ===== */
     select {
-      background: rgba(33,33,33,0.4);              /* semi-transparent */
-      backdrop-filter: blur(4px);                  /* flou derrière */
+      background: rgba(33,33,33,0.4);
+      backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       border: 1px solid rgba(255,255,255,0.25);
       color: #B3A8A8;
       padding: 10px;
       border-radius: 8px;
       font-size: 15px;
-      appearance: none;                             /* masque le style/flèche par défaut */
+      appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      background-image: none !important;            /* évite le caret clair */
+      background-image: none !important;
       position: relative;
     }
-    /* Vieilles versions Edge/IE: masque la flèche */
     select::-ms-expand { display: none; }
-
     select:focus {
       outline: none;
       border-color: rgba(255,255,255,0.45);
-      background: rgba(33,33,33,0.5);              /* un poil plus sombre au focus */
+      background: rgba(33,33,33,0.5);
     }
-
-    /* Liste des options (quand le menu est ouvert) — support variable selon navigateurs */
     select option {
-      background-color: rgba(20,20,20,0.95);       /* fond sombre quasi opaque */
+      background-color: rgba(20,20,20,0.95);
       color: #BEBEBE;
     }
 
@@ -95,6 +91,11 @@
     }
     .admin-actions { position:absolute; top:8px; right:8px; display:flex; gap:6px; }
     .admin-actions button { padding:4px 8px; font-size:12px; border-radius:6px; }
+
+    /* zone de réponse inline */
+    .replybox { display:none; margin-top:10px; }
+    .replybox textarea { width:100%; min-height:80px; }
+    .replybox .actions { display:flex; gap:8px; margin-top:6px; }
   </style>
 </head>
 <body>
@@ -147,7 +148,7 @@
 
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <script>
-    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
+    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev"; // remplace si tu changes de Worker
     const API = API_BASE + "/comments";
 
     // Admin token stocké uniquement en session de l’onglet
@@ -205,7 +206,7 @@
 
     refreshAdminButton();
 
-    // ----- Liste des commentaires
+    // ----- Liste des commentaires (avec reply inline pour admin)
     async function loadComments(){
       try{
         const r = await fetch(API);
@@ -230,6 +231,13 @@
             html += `<div class="admin-actions">
                        <button class="btn-small" data-action="reply">Reply</button>
                        <button class="btn-small" data-action="delete">Delete</button>
+                     </div>
+                     <div class="replybox">
+                       <textarea placeholder="Write a dev reply…"></textarea>
+                       <div class="actions">
+                         <button class="btn-small" data-action="send-reply">Send</button>
+                         <button class="btn-small" data-action="cancel-reply">Cancel</button>
+                       </div>
                      </div>`;
           }
 
@@ -238,37 +246,52 @@
         });
 
         if (isAdminActive()) {
-          document.querySelectorAll('.admin-actions button').forEach(btn=>{
-            btn.addEventListener('click', async (e)=>{
-              const action = btn.dataset.action;
-              const wrapper = btn.closest('.comment');
-              const id = wrapper?.dataset?.id;
-              if (!id) return;
+          document.querySelectorAll('.comment').forEach(wrap=>{
+            const id = wrap.dataset.id;
+            const actions = wrap.querySelector('.admin-actions');
+            const box = wrap.querySelector('.replybox');
+            if (!actions || !box) return;
 
-              if (action === 'delete') {
-                if (!confirm('Delete this comment?')) return;
-                const rr = await fetch(`${API}/${id}`, {
-                  method: "DELETE",
-                  headers: { "Authorization": `Bearer ${ADMIN_TOKEN}` }
-                });
-                if (!rr.ok) { alert('Delete failed'); return; }
-                loadComments();
-              }
+            const btnReply  = actions.querySelector('[data-action="reply"]');
+            const btnDelete = actions.querySelector('[data-action="delete"]');
+            const btnSend   = box.querySelector('[data-action="send-reply"]');
+            const btnCancel = box.querySelector('[data-action="cancel-reply"]');
+            const textarea  = box.querySelector('textarea');
 
-              if (action === 'reply') {
-                const text = prompt('Reply as "Anatomie Sonore":');
-                if (!text || !text.trim()) return;
-                const rr = await fetch(`${API}/${id}/reply`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type":"application/json",
-                    "Authorization": `Bearer ${ADMIN_TOKEN}`
-                  },
-                  body: JSON.stringify({ reply: text.trim() })
-                });
-                if (!rr.ok) { alert('Reply failed'); return; }
-                loadComments();
-              }
+            btnReply.addEventListener('click', ()=>{
+              box.style.display = 'block';
+              textarea.value = '';
+              textarea.focus();
+            });
+
+            btnCancel.addEventListener('click', ()=>{
+              box.style.display = 'none';
+              textarea.value = '';
+            });
+
+            btnSend.addEventListener('click', async ()=>{
+              const text = (textarea.value || '').trim();
+              if (!text) return;
+              const rr = await fetch(`${API}/${id}/reply`, {
+                method: "POST",
+                headers: {
+                  "Content-Type":"application/json",
+                  "Authorization": `Bearer ${ADMIN_TOKEN}`
+                },
+                body: JSON.stringify({ reply: text })
+              });
+              if(!rr.ok){ alert("Reply failed"); return; }
+              loadComments();
+            });
+
+            btnDelete.addEventListener('click', async ()=>{
+              if (!confirm('Delete this comment?')) return;
+              const rr = await fetch(`${API}/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${ADMIN_TOKEN}` }
+              });
+              if(!rr.ok){ alert("Delete failed"); return; }
+              loadComments();
             });
           });
         }
