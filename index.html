@@ -46,10 +46,30 @@
     /* Admin panel + publisher */
     .admin-panel{ display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
       border:1px solid var(--btn-border); border-radius:12px; padding:10px; background:rgba(0,0,0,.2); }
-    .admin-panel input[type="password"], .admin-panel input[type="text"]{
-      background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px; }
-    .admin-panel .publish{ display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px; }
-    .admin-panel .publish input[type="file"]{ width:100%; }
+    .admin-panel input[type="password"]{
+      background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px;
+      min-width:220px;
+    }
+
+    .publish{ display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px; }
+    .publish .row{
+      display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:start; /* texte à gauche, icône fichier à droite */
+    }
+    .publish input[type="text"]{
+      width:100%; background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px;
+    }
+    .publish textarea{
+      width:100%; min-height:110px; resize:vertical; background:transparent; border:1px solid rgba(255,255,255,.25);
+      color:#eee; border-radius:8px; padding:10px 12px; line-height:1.5;
+    }
+    .file-mini{
+      display:inline-flex; align-items:center; justify-content:center; gap:6px;
+      border:1px solid var(--btn-border); border-radius:8px; padding:8px 10px; cursor:pointer; background:none; color:var(--muted);
+      height:42px;
+    }
+    .file-mini:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
+    .file-mini small{ opacity:.85; }
+    #postFiles{ display:none; } /* input natif masqué */
 
     /* Feed */
     #feed{ display:flex; flex-direction:column; gap:12px; }
@@ -59,8 +79,17 @@
     .post-time{ color:#9e9e9e; font-size:.92rem; margin-left:8px; }
     .post-actions button{ padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
     .post-actions button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
-    .post img{ max-width:100%; border-radius:12px; margin:8px 0; cursor:zoom-in; }
-    .post video{ width:100%; border-radius:12px; margin:8px 0; }
+
+    /* corps du post : gauche texte, droite médias */
+    .post-body{
+      display:grid; grid-template-columns: 1fr 320px; gap:12px; align-items:start;
+    }
+    .post-text{ white-space:pre-wrap; line-height:1.55; color:#dcd5d5; }
+    .media-col{ display:flex; flex-direction:column; gap:8px; }
+    .media-col img, .media-col video{
+      width:100%; max-height:260px; object-fit:cover; border-radius:12px; display:block;
+      background:#111;
+    }
 
     /* Lightbox */
     #lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.9); display:none; align-items:center; justify-content:center; z-index:9999; }
@@ -73,6 +102,7 @@
       .card > div:first-child{ flex-direction:column !important; align-items:center !important; gap:30px !important; }
       .card img{ width:200px !important; height:200px !important; }
       .download-button{ height:60px !important; font-size:17px !important; }
+      .post-body{ grid-template-columns: 1fr; } /* stack sur mobile */
     }
   </style>
 </head>
@@ -101,7 +131,6 @@
         <div class="menu-bar">
           <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
           <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
-          <!-- Admin remplace l'ancien switch langue -->
           <button id="adminToggle" class="admin-button" title="Enter admin password">Admin</button>
         </div>
       </div>
@@ -113,10 +142,23 @@
         <button id="adminCancel" class="admin-button">Cancel</button>
 
         <div id="publisher" class="publish">
-          <input id="postTitle" type="text" placeholder="Titre (optionnel)" maxlength="200" style="width:100%;margin-bottom:8px;">
-          <input id="postFiles" type="file" multiple accept="image/*,video/mp4,video/*,.pdf,.zip,.doc,.docx,.ppt,.pptx,.xls,.xlsx" style="margin-bottom:8px;">
-          <button id="postPublish" class="admin-button" style="border-color:#aaa;">Publier</button>
-          <span id="postStatus" style="margin-left:8px;opacity:.8;"></span>
+          <div class="row">
+            <div>
+              <input id="postTitle" type="text" placeholder="Titre (optionnel)" maxlength="200" style="margin-bottom:8px;">
+              <textarea id="postBody" placeholder="Écris ton texte…" maxlength="3000"></textarea>
+            </div>
+
+            <!-- bouton fichier minimaliste -->
+            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+              <input id="postFiles" type="file" multiple accept="image/*,video/mp4,video/*,.pdf,.zip,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
+              <label for="postFiles" class="file-mini" id="fileBtn">
+                <span>📎</span><small id="fileCount">0</small>
+              </label>
+
+              <button id="postPublish" class="admin-button" style="border-color:#aaa;">Publier</button>
+              <span id="postStatus" style="opacity:.8;"></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -128,13 +170,12 @@
   <!-- Lightbox -->
   <div id="lightbox"><button id="lbClose">Close</button><div id="lbContent"></div></div>
 
-  <!-- Footer (licence conservée) -->
+  <!-- Footer -->
   <footer style="margin-top:-20px; margin-bottom:40px; font-size:13px;">
     <span>Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Integrates Tonal.js · MIT · © 2018 Danigb</span>
   </footer>
 
   <script>
-    // === CONFIG API ===
     const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
     const POSTS_API = API_BASE + "/posts";
     const MEDIA_BASE = API_BASE + "/media/";
@@ -147,19 +188,30 @@
     const adminUse    = document.getElementById("adminUse");
     const adminCancel = document.getElementById("adminCancel");
     const publisher   = document.getElementById("publisher");
+
     function isAdmin(){ return !!ADMIN_TOKEN; }
     function refreshAdminUI(){
       adminToggle.classList.toggle("admin-on", isAdmin());
       adminToggle.textContent = isAdmin() ? "Admin: ON" : "Admin";
       if (isAdmin()){
+        // en mode admin: on cache le login et on montre uniquement l'éditeur
         adminPanel.style.display = "flex";
-        publisher.style.display = "block"; // pousse le feed
+        adminPwd.parentElement.style.display = "none";      // cache zone login
+        adminUse.style.display = "none";
+        adminCancel.style.display = "none";
+        publisher.style.display = "block";
       } else {
+        // quand pas admin: le panneau est masqué
         adminPanel.style.display = "none";
-        publisher.style.display = "none";  // le feed remonte
+        publisher.style.display = "none";
         adminPwd.value = "";
+        // réaffiche les contrôles de login au prochain clic
+        adminPwd.parentElement && (adminPwd.parentElement.style.display = "");
+        adminUse.style.display = "";
+        adminCancel.style.display = "";
       }
     }
+
     adminToggle.addEventListener("click", ()=>{
       if (isAdmin()){
         if (confirm("Disable admin mode?")){
@@ -167,7 +219,11 @@
           refreshAdminUI(); loadPosts();
         }
       } else {
+        // montre le panneau avec la zone de login, éditeur masqué
         adminPanel.style.display="flex";
+        adminPwd.parentElement.style.display = ""; // assure visible
+        adminUse.style.display = "";
+        adminCancel.style.display = "";
         publisher.style.display="none";
         adminPwd.value=""; adminPwd.focus();
       }
@@ -186,6 +242,11 @@
     });
     refreshAdminUI();
 
+    // petit compteur fichiers
+    const fileInput = document.getElementById('postFiles');
+    const fileCount = document.getElementById('fileCount');
+    fileInput.addEventListener('change', ()=>{ fileCount.textContent = String(fileInput.files.length||0); });
+
     // === PUBLICATION ===
     document.getElementById("postPublish").addEventListener("click", ()=>{
       const st = document.getElementById("postStatus");
@@ -194,19 +255,17 @@
 
       const fd = new FormData();
       fd.append("title", (document.getElementById("postTitle").value||"").trim());
-      const files = document.getElementById("postFiles").files;
+      fd.append("body",  (document.getElementById("postBody").value||"").trim()); // <-- texte
+      const files = fileInput.files;
       for (let i=0;i<files.length;i++) fd.append("files", files[i]);
 
-      fetch(POSTS_API, {
-        method:"POST",
-        headers:{ "Authorization":"Bearer " + ADMIN_TOKEN }, // ✅ correct
-        body: fd
-      })
+      fetch(POSTS_API, { method:"POST", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN }, body: fd })
       .then(r=>r.json().then(j=>({ok:r.ok,j})))
       .then(x=>{
         if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
         document.getElementById("postTitle").value="";
-        document.getElementById("postFiles").value="";
+        document.getElementById("postBody").value="";
+        fileInput.value=""; fileCount.textContent="0";
         st.textContent = "";
         loadPosts();
       })
@@ -228,15 +287,23 @@
         head.className = "post-head";
         head.innerHTML =
           '<div><span class="post-title">'+esc(p.title||"(no title)")+'</span>'+
-          '<span class="post-time">'+fmtDate(p.created_at)+'</span>'+
-          (p.pinned ? ' <span title="pinned">📌</span>' : '')+
-          '</div>'+
+          '<span class="post-time">'+fmtDate(p.created_at)+'</span></div>'+
           (isAdmin()? '<div class="post-actions">'+
             (p.pinned? '<button data-act="unpin">Unpin</button>' : '<button data-act="pin">Pin</button>')+
             ' <button data-act="del">Delete</button></div>' : '');
         el.appendChild(head);
 
-        const body = document.createElement("div");
+        // Corps 2 colonnes
+        const bodyWrap = document.createElement("div");
+        bodyWrap.className = "post-body";
+
+        const textCol = document.createElement("div");
+        textCol.className = "post-text";
+        const bodyText = (p.body || "").trim();
+        textCol.innerHTML = bodyText ? esc(bodyText) : '<span style="opacity:.7">(no text)</span>';
+
+        const mediaCol = document.createElement("div");
+        mediaCol.className = "media-col";
         (p.attachments||[]).forEach(a=>{
           const ct = (a.contentType||"").toLowerCase();
           const url = MEDIA_BASE + encodeURIComponent(a.key);
@@ -244,18 +311,21 @@
             const img = document.createElement("img");
             img.src = url; img.alt = a.name || "";
             img.addEventListener("click", ()=> openLightbox(url));
-            body.appendChild(img);
+            mediaCol.appendChild(img);
           } else if (ct.startsWith("video/")){
             const vid = document.createElement("video");
             vid.src = url; vid.controls = true;
-            body.appendChild(vid);
+            mediaCol.appendChild(vid);
           } else {
             const link = document.createElement("a");
             link.href = url; link.target="_blank"; link.rel="noopener"; link.textContent = a.name || "file";
-            body.appendChild(link);
+            mediaCol.appendChild(link);
           }
         });
-        el.appendChild(body);
+
+        bodyWrap.appendChild(textCol);
+        bodyWrap.appendChild(mediaCol);
+        el.appendChild(bodyWrap);
 
         if (isAdmin()){
           const doPin = el.querySelector('[data-act="pin"]');
@@ -277,7 +347,7 @@
         .catch(console.error);
     }
 
-    // Lightbox ultra simple
+    // Lightbox
     const lb = document.getElementById("lightbox");
     const lbContent = document.getElementById("lbContent");
     const lbClose = document.getElementById("lbClose");
@@ -291,7 +361,6 @@
     lbClose.onclick = ()=> { lb.style.display="none"; };
     lb.addEventListener("click", (e)=>{ if (e.target === lb) lb.style.display="none"; });
 
-    // Init
     loadPosts();
   </script>
 </body>
