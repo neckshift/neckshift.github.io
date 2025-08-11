@@ -1,16 +1,40 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VCRS1HMR7T"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VCRS1HMR7T');
+  </script>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NeckShift</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
+    :root{
+      --bg:#212121;
+      --text:#B3A8A8;
+      --muted:#AA9E9E;
+      --line:#666;
+      --card: rgba(48,48,48,0.6);
+      --border: rgba(255,255,255,0.1);
+      --btn-border:#888;
+      --btn-bg-r:43;  /* 2b */
+      --btn-bg-g:43;
+      --btn-bg-b:43;
+      --btn-bg-alpha:0.30;    /* 30% de fond */
+      --btn-bg-hover-alpha:0.60;
+      --btn-text:#e9e9e9;
+    }
+
     body {
       margin: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #212121;
-      color: #B3A8A8;
+      background-color: var(--bg);
+      color: var(--text);
       text-align: center;
       line-height: 1.8;
       font-size: 16px;
@@ -27,7 +51,7 @@
     }
 
     .section h2 {
-      color: #AA9E9E;
+      color: var(--muted);
       font-size: 24px;
       margin-top: 40px;
       margin-bottom: 30px;
@@ -40,29 +64,99 @@
       font-size: 17px;
       line-height: 1.6;
       text-align: left;
-      color: #AA9E9E;
+      color: var(--muted);
     }
 
+    /* Boutons de téléchargement – largeur de la bulle, fond transparent 30% */
     .download-button {
-      display: inline-block;
-      width: 300px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;               /* pleine largeur de la bulle */
       height: 70px;
-      line-height: 70px;
-      background: none;
-      color: #AA9E9E;
+      background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha));
+      color: var(--btn-text);    /* texte 100% opaque */
       text-decoration: none;
-      border-radius: 8px;
+      border-radius: 12px;
       text-align: center;
       font-size: 18px;
-      border: 1px solid #888;
-      transition: all 0.3s ease;
+      border: 1.5px solid var(--btn-border);
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
       cursor: pointer;
+      font-weight: 600;
+      letter-spacing: .2px;
+    }
+    .download-button:hover {
+      background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha));
+      border-color: #9a9a9a;
+      transform: translateY(-1px);
+    }
+    .download-button .sub {
+      display:block;
+      font-size:12px;
+      opacity:.9;
+      font-weight:500;
+      letter-spacing:.3px;
+      line-height:1;
+    }
+    .download-button svg{
+      width:22px;height:22px;flex:none;opacity:1;
     }
 
-    .download-button:hover {
-      background-color: #555;
+    /* Barre de menu – largeur de la bulle */
+    .menu-bar-wrap{
+      width: 100%;
+    }
+    .menu-bar {
+      width: 100%;               /* occupe la largeur de la bulle */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin: 0;                 /* plus de liseret en dessous */
+      flex-wrap: wrap;
+    }
+    .menu-button, .kofi-button {
+      padding: 10px 16px;
+      background: none;
+      color: var(--muted);
+      border: 1px solid var(--btn-border);
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background .2s ease, color .2s ease, border-color .2s ease;
+      font-size: 15px;
+      line-height: 1;
+    }
+    .menu-button:hover, .kofi-button:hover {
+      background: #555;
+      color: #fff;
+      border-color: #9a9a9a;
+    }
+
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--btn-border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      background: none;
+    }
+    .lang-switch button{
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .lang-switch button.active{
+      background: #505050;
       color: #fff;
     }
+    .lang-switch svg{width:18px;height:18px;opacity:.9}
 
     @media (max-width: 768px) {
       .section {
@@ -86,52 +180,29 @@
       }
 
       .download-button {
-        width: 240px !important;
         height: 60px !important;
-        line-height: 60px !important;
         font-size: 17px !important;
-        padding: 0 10px;
-        margin-left: auto;
-        margin-right: auto;
-        display: block;
       }
 
-      .section h2 {
-        text-align: center;
-      }
-
-      .section p {
-        text-align: left;
-        padding: 0 10px;
-      }
-
-      .section-title {
-        text-align: center !important;
-      }
+      .section h2 { text-align: center; }
+      .section p { text-align: left; padding: 0 10px; }
+      .section-title { text-align: center !important; }
     }
 
-    .section-title {
-      text-align: left;
-    }
+    .section-title { text-align: left; }
 
     .background {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      overflow: hidden;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: -1; overflow: hidden;
     }
-
     .background img {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       object-fit: cover;
       filter: brightness(0.4);
       will-change: transform, filter;
-      pointer-events: none;
-      user-select: none;
+      pointer-events: none; user-select: none;
     }
   </style>
 </head>
@@ -139,47 +210,143 @@
   <div class="background">
     <img src="createbackground.png" alt="Fond d'écran">
   </div>
+
   <div class="section">
-    <div style="background-color: rgba(48, 48, 48, 0.6); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 40px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1);">
-      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 60px;">
-        <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888; ">
-        <div class="download-button-wrapper" style="display: flex; flex-direction: column; gap: 20px; align-items: center; flex: 1;">
-          <a href="#" download class="download-button">NeckShift v1 - Windows (.zip)</a>
-          <a href="#" download class="download-button">NeckShift v1 - macOS (.dmg)</a>
-<a class="download-button" href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer">Support me on Ko-Fi</a>
-</div>
+    <div style="background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 32px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);">
+      
+      <!-- Top / Hero (boutons = largeur bulle) -->
+      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 40px; flex-wrap: wrap; width:100%;">
+        <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888;">
+        <div class="download-button-wrapper" style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
+          <!-- Windows -->
+          <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShiftSetup.exe" class="download-button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
+            <span>
+              Download for Windows
+              <span class="sub">NeckShift v1 · .exe</span>
+            </span>
+          </a>
+          <!-- macOS -->
+          <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShift.dmg" class="download-button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
+            <span>
+              Download for macOS
+              <span class="sub">NeckShift v1 · .dmg</span>
+            </span>
+          </a>
+        </div>
       </div>
+
+      <!-- MENU (au-dessus, sans liseret en dessous) -->
+      <div class="menu-bar-wrap">
+        <div class="menu-bar">
+          <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
+          <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
+          <div class="lang-switch" aria-label="Language">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2m7.93 8h-3.18a15.7 15.7 0 00-1.2-5A8.021 8.021 0 0119.93 10M12 4a13.7 13.7 0 011.77 6H10.23A13.7 13.7 0 0112 4M4.07 10A8.021 8.021 0 0110.38 5a15.7 15.7 0 00-1.2 5H4.07m0 4h3.18a15.7 15.7 0 001.2 5A8.021 8.021 0 014.07 14M12 20a13.7 13.7 0 01-1.77-6h3.54A13.7 13.7 0 0112 20m1.62-.38a15.7 15.7 0 001.2-5h3.18a8.021 8.021 0 01-4.38 5M7 14a13.7 13.7 0 01-.23-2c0-.68.08-1.34.23-2h10a13.7 13.7 0 01.23 2 13.7 13.7 0 01-.23 2z"/></svg>
+            <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
+            <button type="button" id="btn-fr" onclick="setLang('fr')">Français</button>
+          </div>
+        </div>
+        <!-- liseret supprimé ici -->
+      </div>
+
+      <!-- CONTENU -->
       <div>
-        <hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
-        <h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
-        <p>NeckShift est un logiciel gratuit conçu pour explorer le manche de guitare de façon interactive.</p>
-        <p>Ce logiciel s’adresse à la fois aux guitaristes débutants curieux de comprendre leur instrument, et aux musiciens avancés désireux d’explorer des structures plus complexes.</p>
-        <p>L’interface est pensée pour être fluide, épurée, et entièrement hors ligne. NeckShift utilise la notation musicale anglaise et ne nécessite aucune installation complexe : il suffit de le lancer.</p>
-        <hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
+        <!-- English (default) -->
+        <div id="content-en">
+          <h2 class="section-title"><em>What is NeckShift?</em></h2>
+          <p>NeckShift is a free software designed to explore the fretboard through selections of notes and related scales — interactively.</p>
+          <p>It’s meant for curious beginners who want to understand their instrument and scales, as well as advanced musicians who want a simple tool to compose or explore more complex structures.</p>
+          <p>The interface is smooth and entirely offline. NeckShift uses English musical notation and requires no complex setup — just run it.</p>
 
-        <h2 class="section-title"><em>Fonctionnalités principales</em></h2>
-        <p>NeckShift propose une approche visuelle et interactive de l’étude du manche de guitare. Il affiche une représentation fidèle du manche avec 6 cordes et 17 cases, sur laquelle l’utilisateur peut sélectionner librement les notes.</p>
-        <p>Ces notes détectent et affichent une grande variété de tonalités possibles, avec la possibilité de sélectionner et superposer une gamme sur le manche.</p>
-        <p>Il est également possible d’afficher les intervalles à partir d'une gamme choisie, ce qui permet de mieux comprendre la structure de cette gamme ou d'une position.</p>
-        <p>L’accordage de chaque corde peut être ajusté indépendamment, avec des options pour sauvegarder et restaurer ses accordages.</p>
-        <p>L'ensemble de l'affichage du manche est calculé dynamiquement et suit l'accordage de l'utilisateur, permettant ainsi d'explorer des positions de gammes personnalisées ou de retrouver des tonalités à partir d'accordages complexes.</p>
-        <hr style="border: none; border-top: 1px solid #666; margin: 40px 0;">
+          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
 
-        <h2 class="section-title"><em>Version à venir ?</em></h2>
-        <p>J’ai choisi de désigner cette version comme la v1 car elle marque une étape importante dans le développement du projet.</p>
-        <p>Plusieurs idées d’évolution sont déjà en réflexion pour l’avenir, comme l’ajout d’un mode 7 cordes pour guitare, d’un mode basse, ou encore d’un affichage symétrique guitare/basse répondant aux mêmes commandes.</p>
-        <p>Ces pistes sont encore en réflexion car je tiens à ce que l’interface reste épurée, claire et pratique à utiliser.</p>
-        <p>Développé sur mon temps libre, NeckShift m’a demandé beaucoup de travail et d’énergie, notamment pour corriger certains bugs. C’est un projet personnel auquel je tiens particulièrement.</p>
-        <p>Il m’a semblé aujourd’hui suffisamment stable, clair et utile pour que je puisse le partager avec vous.</p>
-        <p>N’hésitez pas à me faire part de vos retours, de vos suggestions ou à me signaler les bugs éventuels, qu’ils soient visuels ou liés aux fonctionnalités.</p>
-        <p>Vous pouvez le faire directement via le formulaire de contact. Chaque retour compte pour faire évoluer cet outil.</p>
+          <h2 class="section-title"><em>Main Features</em></h2>
+          <p><strong>Compose from what you play</strong>: Select the notes from a riff or chord you just played and instantly discover compatible scales — let the tool guide you.</p>
+          <p><strong>Works with any tuning</strong>: Enter your tuning, including non-standard ones (Drop C, Open G, etc.). You can switch tunings on the fly and everything updates in real time.</p>
+          <p><strong>Interval display</strong>: Visualize scales on the fretboard in note-name or interval mode and switch with a click.</p>
+          <p><strong>Visual scale comparison</strong>: Selected scales appear in blue, hovered scales lighter — differences pop immediately.</p>
+          <p><strong>Learning mode</strong>: Display all scales without having to play anything, perfect for quick practice and visualization.</p>
+
+          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
+
+          <h2 class="section-title"><em>Dev Note</em></h2>
+          <p>I labeled this release as v1 because it marks an important milestone in the project.</p>
+          <p><strong><em>Next planned feature</em></strong>: tuning slots. Save several custom tunings with names and recall them in one click — standard, drop D, an open tuning for slide, etc.</p>
+          <p>Developed in my free time, NeckShift took a lot of work and energy — especially debugging — and I’m not a developer. It’s a personal project I try to improve when I can.</p>
+          <p>It now feels stable, clear, and useful enough to share. Please send feedback, suggestions, or report any issues on the comments page.</p>
+        </div>
+
+        <!-- Français (original) -->
+        <div id="content-fr" style="display:none;">
+          <h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
+          <p>NeckShift est un logiciel gratuit conçu pour explorer le manche via des selections de notes et de gammes associées, le tout de façon interactive.</p>
+          <p>Ce logiciel s’adresse à la fois aux guitaristes débutants curieux de comprendre leur instrument et les gammes, jusqu'aux musiciens avancés désireux d'un outil simple pour composer ou explorer des structures plus complexes.</p>
+          <p>L’interface est pensée pour être fluide, et entièrement hors ligne. NeckShift utilise la notation musicale anglaise et ne nécessite aucune installation complexe : il suffit de le lancer.</p>
+
+          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
+
+          <h2 class="section-title"><em>Fonctionnalités principales</em></h2>
+          <p><strong>Compose à partir de ce que tu joues</strong> : sélectionne les notes d’un riff ou d’un accord que tu viens de jouer, et découvre instantanément les gammes compatibles. Plus besoin de théoriser à l’oreille ou de rechercher quelle gammes sont compatible sur internet — laisse l’outil te guider.</p>
+          <p><strong>Compatible avec tous les accordages</strong> : entre ton accordage, même non standard (Drop C, Open G, etc.), et l’outil adapte automatiquement les gammes affichées. Tu peux même changer d’accordage à la volée : tout se met à jour en temps réel.</p>
+          <p><strong>Affichage des Intervalles</strong> : visualise les gammes sur le manche en mode nom des notes ou en mode intervalles. Tu switches entre les deux en un clic. Très utile pour comprendre la structure d’une gamme ou l’expliquer en cours.</p>
+          <p><strong>Comparaison visuelle des gammes</strong> : les gammes sélectionnées sont affichées en bleu, les gammes survolées en plus clair. Tu vois immédiatement ce qui change d'une gamme à l'autre. Parfait pour l’analyse ou l’apprentissage.</p>
+          <p><strong>Mode apprentissage</strong> : affiche simplement toutes les gammes, sans avoir besoin de jouer quoi que ce soit sur le manche. Si tu veux juste bosser tes gammes et les visualiser rapidement </p>
+
+          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
+
+          <h2 class="section-title"><em>Note Dev</em></h2>
+          <p>J’ai choisi de désigner cette version comme la v1 car elle marque une étape importante dans le développement du projet.</p>
+          <p><strong><em>Prochain ajout prévu</em></strong> : un système de slots d’accordage. L’idée, c’est de pouvoir enregistrer plusieurs accordages personnalisés, leur filer un petit nom, et les retrouver en un clic. Genre t’as ton accordage standard, un drop D, un open tuning pour slide, etc. — tu les as tous sous la main sans devoir les retaper à chaque fois. Ça rendra le truc beaucoup plus fluide pour ceux qui switchent souvent entre plusieurs setups. </p>
+          <p>Développé sur mon temps libre, NeckShift m’a demandé beaucoup de travail et d’énergie, surtout pour débuguer des trucs alors que — faut le dire — je ne suis pas développeur. C’est un projet perso qui me tient à cœur, que j’essaie de faire évoluer quand j’ai le temps. Je ne peux pas promettre de dates pour les ajouts, mais j’y bosse petit à petit.</p>
+          <p>Il m’a semblé aujourd’hui suffisamment stable, clair et utile pour que je puisse le partager avec vous. N’hésitez pas à me faire part de vos retours, de vos suggestions ou à me signaler des problème éventuels que vous rencontrez, dans la page commentaires.</p>
+        </div>
+
       </div>
     </div>
   </div>
-  <footer style="margin-top: -20px; margin-bottom: 40px;; font-size: 13px;">
-    Sous licence | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Intègre Tonal.js · MIT · © 2018 Danigb
+
+  <!-- Footer (i18n) -->
+  <footer style="margin-top: -20px; margin-bottom: 40px; font-size: 13px;">
+    <span id="foot-en">Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Integrates Tonal.js · MIT · © 2018 Danigb</span>
+    <span id="foot-fr" style="display:none;">Sous licence | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Intègre Tonal.js · MIT · © 2018 Danigb</span>
   </footer>
 
-  
+  <script>
+    function setLang(lang){
+      const en = document.getElementById('content-en');
+      const fr = document.getElementById('content-fr');
+      const footEn = document.getElementById('foot-en');
+      const footFr = document.getElementById('foot-fr');
+      const btnEn = document.getElementById('btn-en');
+      const btnFr = document.getElementById('btn-fr');
+
+      if(lang === 'fr'){
+        document.documentElement.lang = 'fr';
+        en.style.display = 'none';
+        fr.style.display = '';
+        footEn.style.display = 'none';
+        footFr.style.display = '';
+        btnEn.classList.remove('active');
+        btnFr.classList.add('active');
+      } else {
+        document.documentElement.lang = 'en';
+        en.style.display = '';
+        fr.style.display = 'none';
+        footEn.style.display = '';
+        footFr.style.display = 'none';
+        btnFr.classList.remove('active');
+        btnEn.classList.add('active');
+      }
+      try { localStorage.setItem('ns_lang', lang); } catch(e){}
+    }
+
+    (function(){
+      let lang = 'en';
+      try { lang = localStorage.getItem('ns_lang') || 'en'; } catch(e){}
+      setLang(lang);
+    })();
+  </script>
 </body>
 </html>
