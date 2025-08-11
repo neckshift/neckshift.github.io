@@ -1,376 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!-- Google tag (gtag.js) -->
+  <!-- Google tag -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-VCRS1HMR7T"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){ dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', 'G-VCRS1HMR7T');
   </script>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>NeckShift</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" href="favicon.png" type="image/png">
   <style>
-    :root{
-      --bg:#212121; --text:#B3A8A8; --muted:#AA9E9E; --line:#666;
-      --card: rgba(48,48,48,0.6); --border: rgba(255,255,255,0.1);
+    :root {
+      --bg:#212121; --text:#B3A8A8; --muted:#AA9E9E;
+      --line:#666; --card:rgba(48,48,48,0.6); --border:rgba(255,255,255,0.1);
       --btn-border:#888; --btn-bg-r:43; --btn-bg-g:43; --btn-bg-b:43;
       --btn-bg-alpha:0.30; --btn-bg-hover-alpha:0.60; --btn-text:#e9e9e9;
-      --accent:#9fd;
+      --accent:#4fa3ff;
     }
-    body{
-      margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-      background-color:var(--bg); color:var(--text); text-align:center; line-height:1.8; font-size:16px;
+    body {
+      margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:var(--bg); color:var(--text); text-align:center; line-height:1.8; font-size:16px;
     }
-    .section{ max-width:100%; margin:30px auto 60px; padding:0 40px; text-align:left; display:flex; flex-direction:column; align-items:center; }
-
-    /* Bulle (largeur d'origine) */
-    .card{
-      background-color:var(--card); border-radius:16px;
-      padding:60px 60px 20px 60px;
-      max-width:1000px; /* <= adapté 13" */
-      width:100%;
-      display:flex; flex-direction:column; gap:24px;
+    .section { max-width:100%; margin:30px auto 60px; padding:0 20px; text-align:left; display:flex; flex-direction:column; align-items:center; }
+    .card {
+      background:var(--card); border-radius:16px; padding:60px; max-width:1000px; width:100%;
+      display:flex; flex-direction:column; gap:32px;
       backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
       border:1px solid var(--border);
     }
-
-    .download-button{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px; width:100%; height:70px;
-      background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha)); color:var(--btn-text); text-decoration:none;
-      border-radius:12px; text-align:center; font-size:18px; border:1.5px solid var(--btn-border);
-      transition:transform .08s ease, background .2s ease, border-color .2s ease; cursor:pointer; font-weight:600; letter-spacing:.2px;
+    .download-button {
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      width:100%; height:70px;
+      background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha));
+      color:var(--btn-text); text-decoration:none; border-radius:12px; font-size:18px;
+      border:1.5px solid var(--btn-border);
+      transition:transform .08s ease, background .2s, border-color .2s; cursor:pointer; font-weight:600;
     }
-    .download-button:hover{ background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha)); border-color:#9a9a9a; transform:translateY(-1px); }
-    .download-button .sub{ display:block; font-size:12px; opacity:.9; font-weight:500; letter-spacing:.3px; line-height:1; }
-    .download-button svg{ width:22px; height:22px; flex:none; opacity:1; }
-
-    .menu-bar-wrap{ width:100%; }
-    .menu-bar{ width:100%; display:flex; justify-content:center; align-items:center; gap:16px; margin:0; flex-wrap:wrap; }
-    .menu-button,.kofi-button,.admin-button{
-      padding:10px 16px; background:none; color:var(--muted); border:1px solid var(--btn-border); border-radius:10px; text-decoration:none;
-      transition:background .2s, color .2s, border-color .2s; font-size:15px; line-height:1; cursor:pointer;
+    .download-button:hover {
+      background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha));
+      border-color:#9a9a9a; transform:translateY(-1px);
     }
-    .menu-button:hover,.kofi-button:hover,.admin-button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
-    .admin-on{ color:#111 !important; background:var(--accent) !important; border-color:var(--accent) !important; }
-
-    .background{ position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; overflow:hidden; }
-    .background img{ width:100%; height:100%; object-fit:cover; filter:brightness(0.4); will-change:transform,filter; pointer-events:none; user-select:none; }
-
-    /* Admin */
-    .admin-panel{
-      display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
-      border:1px solid var(--btn-border); border-radius:12px; padding:10px; background:rgba(0,0,0,.2);
+    .line-menu { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+    .menu-button, .kofi-button, .admin-button {
+      padding:10px 16px; background:none; color:var(--muted);
+      border:1px solid var(--btn-border); border-radius:10px; cursor:pointer;
+      font-size:15px;
     }
-    .admin-panel input[type="password"]{
-      background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px; min-width:220px;
+    .menu-button:hover, .kofi-button:hover, .admin-button:hover {
+      background:#555; color:#fff; border-color:#9a9a9a;
+    }
+    .background { position:fixed; inset:0; z-index:-1; overflow:hidden; }
+    .background img {
+      width:100%; height:100%; object-fit:cover; filter:brightness(0.4);
     }
 
-    .publish{ display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px; }
-    .publish .row{ display:grid; grid-template-columns: 1fr 220px; gap:12px; align-items:start; }
-    .publish input[type="text"], .publish textarea{
-      width:100%; background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:10px 12px;
+    /* ADMIN VISUALS */
+    .admin-panel {
+      display:none; gap:10px; flex-direction:column;
+      border:1px solid var(--border); border-radius:12px; padding:12px;
+      background:rgba(0,0,0,0.2);
     }
-    .publish textarea{ min-height:120px; resize:vertical; line-height:1.55; }
-    .side-col{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
-    .file-mini{
-      display:inline-flex; align-items:center; justify-content:center; gap:6px;
-      border:1px solid var(--btn-border); border-radius:8px; padding:10px 12px; cursor:pointer; background:none; color:var(--muted); height:44px;
+    .admin-panel .cf-banner {
+      text-align:right; margin-bottom:8px;
     }
-    .file-mini:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
-    #postFiles{ display:none; } /* input natif masqué */
-    #postStatus{ opacity:.85; }
+    .admin-panel .cf-banner a {
+      color:var(--accent); text-decoration:underline; font-size:14px;
+    }
+    .admin-panel input[type="text"] {
+      width:100%; padding:6px; font-size:14px; margin-bottom:6px;
+      border:1px solid var(--btn-border); border-radius:6px;
+      background:transparent; color:var(--text);
+    }
+    .admin-publish {
+      display:flex; align-items:flex-start; gap:8px;
+    }
+    .admin-publish textarea {
+      width:calc(100% - 60px); height:80px; resize:vertical; padding:6px;
+      border:1px solid var(--btn-border); border-radius:6px;
+      background:transparent; color:var(--text); font-size:14px;
+    }
+    .file-btn, .publish-btn {
+      padding:6px 10px; font-size:14px;
+      border:1px solid var(--btn-border); border-radius:6px;
+      background:rgba(255,255,255,0.1); color:var(--muted); cursor:pointer;
+    }
+    .file-btn:hover, .publish-btn:hover {
+      background:#555; color:#fff; border-color:#9a9a9a;
+    }
+    .admin-publish input[type="file"] { display:none; }
 
-    /* Feed */
-    #feed{ display:flex; flex-direction:column; gap:12px; }
-    .post{ border:1px solid var(--border); background:rgba(255,255,255,.04); border-radius:12px; padding:12px; }
-    .post-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .post-title{ color:#e8dfdf; font-weight:600; }
-    .post-time{ color:#9e9e9e; font-size:.92rem; margin-left:8px; }
-    .post-actions button{ padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
-    .post-actions button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
-
-    /* Corps du post : texte à gauche, médias à droite (contenus) */
-    .post-body{ display:grid; grid-template-columns: 1fr 360px; gap:12px; align-items:start; }
-    .post-text{ white-space:pre-wrap; line-height:1.55; color:#dcd5d5; }
-    .media-col{ display:flex; flex-direction:column; gap:8px; }
-    .media-col img, .media-col video{
-      width:100%; max-height:280px; object-fit:cover; border-radius:12px; display:block; background:#111;
+    /* FEED LAYOUT */
+    .feed-item {
+      display:flex; gap:12px; background:var(--card); border:1px solid var(--border);
+      border-radius:12px; padding:12px; margin-bottom:12px;
+    }
+    .feed-text { flex:1; text-align:left; color:var(--text); }
+    .feed-media { flex:0 0 40%; max-width:40%; }
+    .feed-media img, .feed-media video {
+      width:100%; height:auto; border-radius:8px;
     }
 
-    /* Lightbox */
-    #lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.9); display:none; align-items:center; justify-content:center; z-index:9999; }
-    #lbContent{ max-width:92vw; max-height:92vh; }
-    #lbClose{ position:absolute; top:12px; right:12px; padding:6px 10px; border-radius:8px; border:1px solid #fff; background:transparent; color:#fff; cursor:pointer; }
-
-    @media (max-width: 900px){
-      .publish .row{ grid-template-columns: 1fr; }
-      .post-body{ grid-template-columns: 1fr; }
-    }
-    @media (max-width: 768px){
-      .section{ padding:0 10px !important; margin-top:30px !important; }
-      .card{ padding:30px 20px !important; }
-      .card > div:first-child{ flex-direction:column !important; align-items:center !important; gap:30px !important; }
-      .card img{ width:200px !important; height:200px !important; }
-      .download-button{ height:60px !important; font-size:17px !important; }
-    }
+    footer { margin-top: -20px; margin-bottom:40px; font-size:13px; color:var(--muted); }
   </style>
 </head>
 <body>
   <div class="background"><img src="createbackground.png" alt="Background"></div>
-
   <div class="section">
     <div class="card">
       <!-- Hero -->
-      <div style="display:flex; align-items:center; justify-content:flex-start; gap:40px; flex-wrap:wrap; width:100%;">
-        <img src="NSicon2.png" alt="NeckShift Favicon" style="width:320px; height:320px; border-radius:44px; image-rendering:-webkit-optimize-contrast; transform:translateZ(0); backface-visibility:hidden; border:2px solid #888;">
-        <div style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
-          <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShiftSetup.exe" class="download-button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
-            <span>Download for Windows <span class="sub">NeckShift v1 · .exe</span></span>
-          </a>
-          <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShift.dmg" class="download-button">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
-            <span>Download for macOS <span class="sub">NeckShift v1 · .dmg</span></span>
-          </a>
+      <div style="display:flex; align-items:center; gap:40px; flex-wrap:wrap;">
+        <img src="NSicon2.png" alt="NeckShift" style="width:300px; height:300px; border-radius:44px; border:2px solid #888;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:16px;">
+          <a href="#" class="download-button">Download for Windows</a>
+          <a href="#" class="download-button">Download for macOS</a>
         </div>
       </div>
 
-      <!-- MENU -->
-      <div class="menu-bar-wrap">
-        <div class="menu-bar">
-          <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
-          <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
-          <button id="adminToggle" class="admin-button" title="Enter admin password">Admin</button>
-        </div>
+      <!-- Menu -->
+      <div class="line-menu">
+        <button class="menu-button">Comments</button>
+        <button class="kofi-button">Support me on Ko-Fi</button>
+        <button class="admin-button" id="admin-toggle">Admin</button>
       </div>
 
-      <!-- ADMIN PANEL -->
-      <div id="adminPanel" class="admin-panel">
-        <!-- bloc login séparé -->
-        <div id="adminLogin" style="display:flex; gap:10px; align-items:center;">
-          <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
-          <button id="adminUse" class="admin-button">Use</button>
-          <button id="adminCancel" class="admin-button">Cancel</button>
+      <!-- Admin Panel -->
+      <div class="admin-panel" id="admin-panel">
+        <div class="cf-banner">
+          <a href="https://dash.cloudflare.com/cfd417bb1202fa09f4f046f06819c56f/r2/overview" target="_blank">Check Cloudflare / 10 Go limite</a>
         </div>
-
-        <!-- Editeur -->
-        <div id="publisher" class="publish">
-          <div class="row">
-            <div>
-              <input id="postTitle" type="text" placeholder="Titre (optionnel)" maxlength="200" style="margin-bottom:8px;">
-              <textarea id="postBody" placeholder="Écris ton texte…" maxlength="3000"></textarea>
-            </div>
-            <div class="side-col">
-              <input id="postFiles" type="file" multiple accept="image/*,video/mp4,video/*,.pdf,.zip,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
-              <label for="postFiles" class="file-mini" id="fileBtn"><span>📎</span><small id="fileCount">0</small></label>
-              <button id="postPublish" class="admin-button" style="border-color:#aaa;">Publier</button>
-              <span id="postStatus"></span>
-            </div>
+        <input type="text" id="post-title" placeholder="Titre (optionnel)">
+        <div class="admin-publish">
+          <textarea id="post-body" placeholder="Écris ton texte..."></textarea>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <input type="file" id="post-file" multiple>
+            <label for="post-file" class="file-btn">📁 Fichiers</label>
+            <button class="publish-btn" id="post-publish">Publier</button>
           </div>
         </div>
       </div>
 
-      <!-- FEED -->
-      <div id="feed"></div>
+      <!-- Feed -->
+      <div id="feed">
+        <!-- Example item -->
+        <div class="feed-item">
+          <div class="feed-text">
+            <strong>Exemple de titre</strong>
+            <p>Voici un exemple de texte de post.</p>
+          </div>
+          <div class="feed-media">
+            <img src="example.jpg" alt="Media">
+          </div>
+        </div>
+      </div>
+
+      <footer>Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore</footer>
     </div>
   </div>
 
-  <!-- Lightbox -->
-  <div id="lightbox"><button id="lbClose">Close</button><div id="lbContent"></div></div>
-
-  <!-- Footer -->
-  <footer style="margin-top:-20px; margin-bottom:40px; font-size:13px;">
-    <span>Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Integrates Tonal.js · MIT · © 2018 Danigb</span>
-  </footer>
-
   <script>
-    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
-    const POSTS_API = API_BASE + "/posts";
-    const MEDIA_BASE = API_BASE + "/media/";
-
-    // === ADMIN UI (ne cacher que le bloc login) ===
-    let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
-    const adminToggle = document.getElementById("adminToggle");
-    const adminPanel  = document.getElementById("adminPanel");
-    const adminLogin  = document.getElementById("adminLogin");
-    const adminPwd    = document.getElementById("adminPassword");
-    const adminUse    = document.getElementById("adminUse");
-    const adminCancel = document.getElementById("adminCancel");
-    const publisher   = document.getElementById("publisher");
-
-    function isAdmin(){ return !!ADMIN_TOKEN; }
-    function refreshAdminUI(){
-      adminToggle.classList.toggle("admin-on", isAdmin());
-      adminToggle.textContent = isAdmin() ? "Admin: ON" : "Admin";
-      if (isAdmin()){
-        adminPanel.style.display = "flex";
-        adminLogin.style.display = "none";
-        publisher.style.display  = "block";   // pousse le feed
-      } else {
-        adminPanel.style.display = "none";
-        adminLogin.style.display = "flex";
-        publisher.style.display  = "none";    // le feed remonte
-        adminPwd.value = "";
-      }
-    }
-
-    adminToggle.addEventListener("click", ()=>{
-      if (isAdmin()){
-        if (confirm("Disable admin mode?")){
-          ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token");
-          refreshAdminUI(); loadPosts();
-        }
-      } else {
-        adminPanel.style.display = "flex";
-        adminLogin.style.display = "flex";
-        publisher.style.display  = "none";
-        adminPwd.value = ""; adminPwd.focus();
-      }
+    const adminToggle = document.getElementById('admin-toggle');
+    const adminPanel = document.getElementById('admin-panel');
+    adminToggle.addEventListener('click', () => {
+      adminPanel.style.display = adminPanel.style.display === 'flex' ? 'none' : 'flex';
     });
-
-    adminUse.addEventListener("click", ()=>{
-      const t = adminPwd.value.trim(); if (!t) return;
-      fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer " + t } })
-        .then(r => r.json().then(j => ({ ok: r.ok, j })))
-        .then(x => {
-          if(!x.ok || !x.j.ok){ alert("Wrong password"); return; }
-          ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
-          refreshAdminUI(); loadPosts();
-        })
-        .catch(()=>alert("Network error"));
-    });
-
-    adminCancel.addEventListener("click", ()=>{
-      adminPanel.style.display = "none";
-      adminPwd.value = "";
-      publisher.style.display  = "none";
-    });
-
-    refreshAdminUI();
-
-    // compteur fichiers
-    const fileInput = document.getElementById('postFiles');
-    const fileCount = document.getElementById('fileCount');
-    fileInput.addEventListener('change', ()=>{ fileCount.textContent = String(fileInput.files.length||0); });
-
-    // === PUBLICATION ===
-    document.getElementById("postPublish").addEventListener("click", ()=>{
-      const st = document.getElementById("postStatus");
-      st.textContent = "";
-      if (!isAdmin()){ st.textContent = "Admin only."; return; }
-
-      const fd = new FormData();
-      fd.append("title", (document.getElementById("postTitle").value||"").trim());
-      fd.append("body",  (document.getElementById("postBody").value||"").trim());
-      const files = fileInput.files;
-      for (let i=0;i<files.length;i++) fd.append("files", files[i]);
-
-      fetch(POSTS_API, { method:"POST", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN }, body: fd })
-        .then(r => r.json().then(j => ({ ok: r.ok, j })))
-        .then(x => {
-          if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
-          document.getElementById("postTitle").value="";
-          document.getElementById("postBody").value="";
-          fileInput.value=""; fileCount.textContent="0";
-          st.textContent = "";
-          loadPosts();
-        })
-        .catch(()=>{ st.textContent="Network error"; });
-    });
-
-    // === FEED (2 colonnes) ===
-    const feed = document.getElementById("feed");
-    function esc(s){return (s||"").replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-    function fmtDate(iso){ try{ return new Date(iso||Date.now()).toLocaleString(); } catch(e){ return ""; } }
-
-    function renderPosts(items){
-      feed.innerHTML = "";
-      (items||[]).forEach(p=>{
-        const el = document.createElement("div");
-        el.className = "post";
-
-        const head = document.createElement("div");
-        head.className = "post-head";
-        head.innerHTML =
-          '<div><span class="post-title">'+esc(p.title||"(no title)")+'</span>'+
-          '<span class="post-time">'+fmtDate(p.created_at)+'</span></div>'+
-          (isAdmin()? '<div class="post-actions">'+
-            (p.pinned? '<button data-act="unpin">Unpin</button>' : '<button data-act="pin">Pin</button>')+
-            ' <button data-act="del">Delete</button></div>' : '');
-        el.appendChild(head);
-
-        const bodyWrap = document.createElement("div");
-        bodyWrap.className = "post-body";
-
-        const textCol = document.createElement("div");
-        textCol.className = "post-text";
-        const bodyText = (p.body || "").trim();
-        textCol.innerHTML = bodyText ? esc(bodyText) : '<span style="opacity:.7">(no text)</span>';
-
-        const mediaCol = document.createElement("div");
-        mediaCol.className = "media-col";
-        (p.attachments||[]).forEach(a=>{
-          const ct = (a.contentType||"").toLowerCase();
-          const url = MEDIA_BASE + encodeURIComponent(a.key);
-          if (ct.startsWith("image/")){
-            const img = document.createElement("img");
-            img.src = url; img.alt = a.name || "";
-            img.addEventListener("click", ()=> openLightbox(url));
-            mediaCol.appendChild(img);
-          } else if (ct.startsWith("video/")){
-            const vid = document.createElement("video");
-            vid.src = url; vid.controls = true;
-            mediaCol.appendChild(vid);
-          } else {
-            const link = document.createElement("a");
-            link.href = url; link.target="_blank"; link.rel="noopener"; link.textContent = a.name || "file";
-            mediaCol.appendChild(link);
-          }
-        });
-
-        bodyWrap.appendChild(textCol);
-        bodyWrap.appendChild(mediaCol);
-        el.appendChild(bodyWrap);
-
-        if (isAdmin()){
-          const doPin = el.querySelector('[data-act="pin"]');
-          const doUnpin = el.querySelector('[data-act="unpin"]');
-          const doDel = el.querySelector('[data-act="del"]');
-          if (doPin)   doPin.onclick   = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"POST", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN } }).then(()=>loadPosts());
-          if (doUnpin) doUnpin.onclick = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"DELETE", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN } }).then(()=>loadPosts());
-          if (doDel)   doDel.onclick   = ()=> { if (confirm("Delete this post?")) fetch(POSTS_API+'/'+p.id, { method:"DELETE", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN } }).then(()=>loadPosts()); };
-        }
-
-        feed.appendChild(el);
-      });
-    }
-
-    function loadPosts(){
-      fetch(POSTS_API, { cache:"no-store" })
-        .then(r=>r.json())
-        .then(renderPosts)
-        .catch(console.error);
-    }
-
-    // Lightbox
-    const lb = document.getElementById("lightbox");
-    const lbContent = document.getElementById("lbContent");
-    const lbClose = document.getElementById("lbClose");
-    function openLightbox(src){
-      lbContent.innerHTML = "";
-      const img = document.createElement("img");
-      img.src = src; img.style.maxWidth="92vw"; img.style.maxHeight="92vh";
-      lbContent.appendChild(img);
-      lb.style.display = "flex";
-    }
-    lbClose.onclick = ()=> { lb.style.display="none"; };
-    lb.addEventListener("click", (e)=>{ if (e.target === lb) lb.style.display="none"; });
-
-    loadPosts();
   </script>
 </body>
 </html>
