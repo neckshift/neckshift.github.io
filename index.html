@@ -21,6 +21,10 @@
       --btn-bg-alpha:0.30; --btn-bg-hover-alpha:0.60; --btn-text:#e9e9e9;
       --accent:#9fd;
     }
+
+    /* nouvel ajout: box-sizing global pour éviter les débordements/chevauchements */
+    *, *::before, *::after { box-sizing: border-box; }
+
     body{
       margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
       background-color:var(--bg); color:var(--text); text-align:center; line-height:1.8; font-size:16px;
@@ -70,12 +74,22 @@
     }
 
     .publish{ display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px; }
-    .publish .row{ display:grid; grid-template-columns: 1fr 220px; gap:12px; align-items:start; }
+    /* grille plus robuste : pas de chevauchement même quand la colonne droite est pleine */
+    .publish .row{
+      display:grid;
+      grid-template-columns: minmax(0,1fr) 260px;
+      gap:12px;
+      align-items:start;
+    }
     .publish input[type="text"], .publish textarea{
       width:100%; background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:10px 12px;
     }
     .publish textarea{ min-height:120px; resize:vertical; line-height:1.55; }
     .side-col{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
+    /* largeur 100% pour les actions de droite afin d'éviter les dépassements */
+    .side-col .file-mini,
+    .side-col .admin-button{ width:100%; }
+
     .file-mini{
       display:inline-flex; align-items:center; justify-content:center; gap:6px;
       border:1px solid var(--btn-border); border-radius:8px; padding:10px 12px; cursor:pointer; background:none; color:var(--muted); height:44px;
@@ -97,8 +111,14 @@
     .post-body{ display:grid; grid-template-columns: 1fr 360px; gap:12px; align-items:start; }
     .post-text{ white-space:pre-wrap; line-height:1.55; color:#dcd5d5; }
     .media-col{ display:flex; flex-direction:column; gap:8px; }
+    /* affichage ENTIER des médias (miniatures proportionnelles) */
     .media-col img, .media-col video{
-      width:100%; max-height:280px; object-fit:cover; border-radius:12px; display:block; background:#111;
+      width:100%;
+      max-height:280px;
+      object-fit:contain;           /* ← était cover */
+      border-radius:12px;
+      display:block;
+      background:#111;              /* bandes noires neutres si nécessaire */
     }
 
     /* Lightbox */
@@ -161,6 +181,12 @@
         <div id="publisher" class="publish">
           <div class="row">
             <div>
+              <!-- lien CF au-dessus du titre -->
+              <div style="margin:0 0 6px 2px; font-size:13px;">
+                <a href="https://dash.cloudflare.com/cfd417bb1202fa09f4f046f06819c56f/r2/overview" target="_blank" rel="noopener noreferrer" style="color:var(--accent); text-decoration:none;">
+                  check Cloudflare / 10go limit
+                </a>
+              </div>
               <input id="postTitle" type="text" placeholder="Titre (optionnel)" maxlength="200" style="margin-bottom:8px;">
               <textarea id="postBody" placeholder="Écris ton texte…" maxlength="3000"></textarea>
             </div>
@@ -324,6 +350,7 @@
           } else if (ct.startsWith("video/")){
             const vid = document.createElement("video");
             vid.src = url; vid.controls = true;
+            /* object-fit: contain déjà en CSS pour l’aperçu */
             mediaCol.appendChild(vid);
           } else {
             const link = document.createElement("a");
