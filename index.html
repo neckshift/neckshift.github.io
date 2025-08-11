@@ -15,132 +15,80 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <style>
     :root{
-      --bg:#212121;
-      --text:#B3A8A8;
-      --muted:#AA9E9E;
-      --line:#666;
-      --card: rgba(48,48,48,0.6);
-      --border: rgba(255,255,255,0.1);
-      --btn-border:#888;
-      --btn-bg-r:43; --btn-bg-g:43; --btn-bg-b:43;
-      --btn-bg-alpha:0.30; --btn-bg-hover-alpha:0.60;
-      --btn-text:#e9e9e9;
+      --bg:#212121; --text:#B3A8A8; --muted:#AA9E9E; --line:#666;
+      --card: rgba(48,48,48,0.6); --border: rgba(255,255,255,0.1);
+      --btn-border:#888; --btn-bg-r:43; --btn-bg-g:43; --btn-bg-b:43;
+      --btn-bg-alpha:0.30; --btn-bg-hover-alpha:0.60; --btn-text:#e9e9e9;
       --accent:#9fd;
     }
+    body{ margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background-color:var(--bg); color:var(--text); text-align:center; line-height:1.8; font-size:16px; }
+    .section{ max-width:100%; margin:30px auto 60px; padding:0 40px; text-align:left; display:flex; flex-direction:column; align-items:center; }
+    .card{ background-color:var(--card); border-radius:16px; padding:60px 60px 20px 60px; max-width:1000px;
+      display:flex; flex-direction:column; gap:24px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border); }
+    .download-button{ display:inline-flex; align-items:center; justify-content:center; gap:10px; width:100%; height:70px;
+      background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha)); color:var(--btn-text); text-decoration:none;
+      border-radius:12px; text-align:center; font-size:18px; border:1.5px solid var(--btn-border); transition:transform .08s ease,background .2s,border-color .2s;
+      cursor:pointer; font-weight:600; letter-spacing:.2px; }
+    .download-button:hover{ background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha)); border-color:#9a9a9a; transform:translateY(-1px); }
+    .download-button .sub{ display:block; font-size:12px; opacity:.9; font-weight:500; letter-spacing:.3px; line-height:1; }
+    .download-button svg{ width:22px; height:22px; flex:none; opacity:1; }
+    .menu-bar-wrap{ width:100%; }
+    .menu-bar{ width:100%; display:flex; justify-content:center; align-items:center; gap:16px; margin:0; flex-wrap:wrap; }
+    .menu-button,.kofi-button,.admin-button{
+      padding:10px 16px; background:none; color:var(--muted); border:1px solid var(--btn-border); border-radius:10px; text-decoration:none;
+      transition:background .2s ease, color .2s ease, border-color .2s ease; font-size:15px; line-height:1; cursor:pointer; }
+    .menu-button:hover,.kofi-button:hover,.admin-button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
+    .admin-on{ color:#111 !important; background:var(--accent) !important; border-color:var(--accent) !important; }
+    .background{ position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; overflow:hidden; }
+    .background img{ width:100%; height:100%; object-fit:cover; filter:brightness(0.4); will-change:transform,filter; pointer-events:none; user-select:none; }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      text-align: center;
-      line-height: 1.8;
-      font-size: 16px;
-    }
-
-    .section {
-      max-width: 100%;
-      margin: 30px auto 60px;
-      padding: 0 40px;
-      text-align: left;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* Boutons de téléchargement – largeur de la bulle, fond transparent 30% */
-    .download-button {
-      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%; height: 70px;
-      background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha));
-      color: var(--btn-text); text-decoration: none; border-radius: 12px; text-align: center; font-size: 18px;
-      border: 1.5px solid var(--btn-border);
-      transition: transform .08s ease, background .2s ease, border-color .2s ease;
-      cursor: pointer; font-weight: 600; letter-spacing: .2px;
-    }
-    .download-button:hover { background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha)); border-color: #9a9a9a; transform: translateY(-1px); }
-    .download-button .sub { display:block; font-size:12px; opacity:.9; font-weight:500; letter-spacing:.3px; line-height:1; }
-    .download-button svg{ width:22px;height:22px;flex:none;opacity:1; }
-
-    /* Barre de menu */
-    .menu-bar-wrap{ width: 100%; }
-    .menu-bar {
-      width: 100%; display: flex; justify-content: center; align-items: center; gap: 16px; margin: 0; flex-wrap: wrap;
-    }
-    .menu-button, .kofi-button, .admin-button {
-      padding: 10px 16px; background: none; color: var(--muted);
-      border: 1px solid var(--btn-border); border-radius: 10px; text-decoration: none;
-      transition: background .2s ease, color .2s ease, border-color .2s ease;
-      font-size: 15px; line-height: 1; cursor:pointer;
-    }
-    .menu-button:hover, .kofi-button:hover, .admin-button:hover { background: #555; color: #fff; border-color: #9a9a9a; }
-    .admin-on { color: #111 !important; background: var(--accent) !important; border-color: var(--accent) !important; }
-
-    @media (max-width: 768px) {
-      .section { padding: 0 10px !important; margin-top: 30px !important; }
-      .section > div { padding: 30px 20px !important; }
-      .section > div > div:first-child { flex-direction: column !important; align-items: center !important; gap: 30px !important; }
-      .section img { width: 200px !important; height: 200px !important; }
-      .download-button { height: 60px !important; font-size: 17px !important; }
-    }
-
-    .background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
-    .background img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4); will-change: transform, filter; pointer-events: none; user-select: none; }
-
-    /* Carte principale */
-    .card {
-      background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 24px;
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);
-    }
-
-    /* Admin inline panel */
-    .admin-panel {
-      display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
-      border:1px solid var(--btn-border); border-radius:12px; padding:10px; background: rgba(0,0,0,.2);
-    }
-    .admin-panel input[type="password"], .admin-panel input[type="text"] {
-      background: transparent; border: 1px solid rgba(255,255,255,.25); color: #eee; border-radius: 8px; padding: 8px 10px;
-    }
-    .admin-panel .publish {
-      display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px;
-    }
-    .admin-panel .publish input[type="file"] { width:100%; }
+    /* Admin panel + publisher */
+    .admin-panel{ display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
+      border:1px solid var(--btn-border); border-radius:12px; padding:10px; background:rgba(0,0,0,.2); }
+    .admin-panel input[type="password"], .admin-panel input[type="text"]{
+      background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px; }
+    .admin-panel .publish{ display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px; }
+    .admin-panel .publish input[type="file"]{ width:100%; }
 
     /* Feed */
-    #feed { display:flex; flex-direction:column; gap:12px; }
-    .post {
-      border:1px solid var(--border); background: rgba(255,255,255,.04);
-      border-radius: 12px; padding: 12px;
-    }
-    .post-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .post-title { color:#e8dfdf; font-weight:600; }
-    .post-time { color:#9e9e9e; font-size: 0.92rem; margin-left:8px; }
-    .post-actions button { padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
-    .post-actions button:hover { background:#555; color:#fff; border-color:#9a9a9a; }
-    .post img { max-width:100%; border-radius:12px; margin:8px 0; cursor:zoom-in; }
-    .post video { width:100%; border-radius:12px; margin:8px 0; }
+    #feed{ display:flex; flex-direction:column; gap:12px; }
+    .post{ border:1px solid var(--border); background:rgba(255,255,255,.04); border-radius:12px; padding:12px; }
+    .post-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .post-title{ color:#e8dfdf; font-weight:600; }
+    .post-time{ color:#9e9e9e; font-size:.92rem; margin-left:8px; }
+    .post-actions button{ padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
+    .post-actions button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
+    .post img{ max-width:100%; border-radius:12px; margin:8px 0; cursor:zoom-in; }
+    .post video{ width:100%; border-radius:12px; margin:8px 0; }
 
-    /* Lightbox très léger */
-    #lightbox { position:fixed; inset:0; background:rgba(0,0,0,.9); display:none; align-items:center; justify-content:center; z-index:9999; }
-    #lbContent { max-width:92vw; max-height:92vh; }
-    #lbClose { position:absolute; top:12px; right:12px; padding:6px 10px; border-radius:8px; border:1px solid #fff; background:transparent; color:#fff; cursor:pointer; }
+    /* Lightbox */
+    #lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.9); display:none; align-items:center; justify-content:center; z-index:9999; }
+    #lbContent{ max-width:92vw; max-height:92vh; }
+    #lbClose{ position:absolute; top:12px; right:12px; padding:6px 10px; border-radius:8px; border:1px solid #fff; background:transparent; color:#fff; cursor:pointer; }
+
+    @media (max-width: 768px){
+      .section{ padding:0 10px !important; margin-top:30px !important; }
+      .card{ padding:30px 20px !important; }
+      .card > div:first-child{ flex-direction:column !important; align-items:center !important; gap:30px !important; }
+      .card img{ width:200px !important; height:200px !important; }
+      .download-button{ height:60px !important; font-size:17px !important; }
+    }
   </style>
 </head>
 <body>
-  <div class="background"><img src="createbackground.png" alt="Fond d'écran"></div>
+  <div class="background"><img src="createbackground.png" alt="Background"></div>
 
   <div class="section">
     <div class="card">
-      <!-- Top / Hero -->
-      <div style="display: flex; align-items: center; justify-content: flex-start; gap: 40px; flex-wrap: wrap; width:100%;">
-        <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888;">
-        <div class="download-button-wrapper" style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
-          <!-- Windows -->
+      <!-- Hero -->
+      <div style="display:flex; align-items:center; justify-content:flex-start; gap:40px; flex-wrap:wrap; width:100%;">
+        <img src="NSicon2.png" alt="NeckShift Favicon" style="width:320px; height:320px; border-radius:44px; image-rendering:-webkit-optimize-contrast; transform:translateZ(0); backface-visibility:hidden; border:2px solid #888;">
+        <div style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
           <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShiftSetup.exe" class="download-button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
             <span>Download for Windows <span class="sub">NeckShift v1 · .exe</span></span>
           </a>
-          <!-- macOS -->
           <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShift.dmg" class="download-button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
             <span>Download for macOS <span class="sub">NeckShift v1 · .dmg</span></span>
@@ -153,12 +101,12 @@
         <div class="menu-bar">
           <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
           <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
-          <!-- Admin remplace l'ancien switch de langue -->
+          <!-- Admin remplace l'ancien switch langue -->
           <button id="adminToggle" class="admin-button" title="Enter admin password">Admin</button>
         </div>
       </div>
 
-      <!-- ADMIN PANEL + PUBLISHER (apparait uniquement en mode admin) -->
+      <!-- ADMIN PANEL + PUBLISHER -->
       <div id="adminPanel" class="admin-panel">
         <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
         <button id="adminUse" class="admin-button">Use</button>
@@ -181,17 +129,17 @@
   <div id="lightbox"><button id="lbClose">Close</button><div id="lbContent"></div></div>
 
   <!-- Footer (licence conservée) -->
-  <footer style="margin-top: -20px; margin-bottom: 40px; font-size: 13px;">
+  <footer style="margin-top:-20px; margin-bottom:40px; font-size:13px;">
     <span>Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Integrates Tonal.js · MIT · © 2018 Danigb</span>
   </footer>
 
   <script>
     // === CONFIG API ===
-    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev"; // ton worker
+    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev";
     const POSTS_API = API_BASE + "/posts";
     const MEDIA_BASE = API_BASE + "/media/";
 
-    // === ADMIN UI (comme sur comments) ===
+    // === ADMIN UI ===
     let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
     const adminToggle = document.getElementById("adminToggle");
     const adminPanel  = document.getElementById("adminPanel");
@@ -201,18 +149,15 @@
     const publisher   = document.getElementById("publisher");
     function isAdmin(){ return !!ADMIN_TOKEN; }
     function refreshAdminUI(){
-      // bouton header
       adminToggle.classList.toggle("admin-on", isAdmin());
       adminToggle.textContent = isAdmin() ? "Admin: ON" : "Admin";
-      // panneau
       if (isAdmin()){
         adminPanel.style.display = "flex";
-        publisher.style.display = "block"; // -> pousse le feed vers le bas
+        publisher.style.display = "block"; // pousse le feed
       } else {
-        // ferme la zone de login + masque publisher
-        document.getElementById("adminPassword").value="";
         adminPanel.style.display = "none";
-        publisher.style.display = "none"; // -> le feed remonte
+        publisher.style.display = "none";  // le feed remonte
+        adminPwd.value = "";
       }
     }
     adminToggle.addEventListener("click", ()=>{
@@ -222,7 +167,6 @@
           refreshAdminUI(); loadPosts();
         }
       } else {
-        // affiche juste la barre de login (sans publisher)
         adminPanel.style.display="flex";
         publisher.style.display="none";
         adminPwd.value=""; adminPwd.focus();
@@ -230,7 +174,7 @@
     });
     adminUse.addEventListener("click", ()=>{
       const t = adminPwd.value.trim(); if (!t) return;
-      fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer "+t } })
+      fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer " + t } })
         .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(x=>{
           if(!x.ok || !x.j.ok){ alert("Wrong password"); return; }
           ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
@@ -242,7 +186,7 @@
     });
     refreshAdminUI();
 
-    // === PUBLISH ===
+    // === PUBLICATION ===
     document.getElementById("postPublish").addEventListener("click", ()=>{
       const st = document.getElementById("postStatus");
       st.textContent = "";
@@ -253,18 +197,24 @@
       const files = document.getElementById("postFiles").files;
       for (let i=0;i<files.length;i++) fd.append("files", files[i]);
 
-      fetch(POSTS_API, { method:"POST", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN" }, body: fd })
-        .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(x=>{
-          if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
-          document.getElementById("postTitle").value=""; document.getElementById("postFiles").value="";
-          st.textContent = "";
-          loadPosts();
-        }).catch(()=>{ st.textContent="Network error"; });
+      fetch(POSTS_API, {
+        method:"POST",
+        headers:{ "Authorization":"Bearer " + ADMIN_TOKEN }, // ✅ correct
+        body: fd
+      })
+      .then(r=>r.json().then(j=>({ok:r.ok,j})))
+      .then(x=>{
+        if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
+        document.getElementById("postTitle").value="";
+        document.getElementById("postFiles").value="";
+        st.textContent = "";
+        loadPosts();
+      })
+      .catch(()=>{ st.textContent="Network error"; });
     });
 
-    // === FEED RENDER ===
+    // === FEED ===
     const feed = document.getElementById("feed");
-
     function esc(s){return (s||"").replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
     function fmtDate(iso){ try{ return new Date(iso||Date.now()).toLocaleString(); } catch(e){ return ""; } }
 
@@ -274,7 +224,6 @@
         const el = document.createElement("div");
         el.className = "post";
 
-        // Header
         const head = document.createElement("div");
         head.className = "post-head";
         head.innerHTML =
@@ -287,7 +236,6 @@
             ' <button data-act="del">Delete</button></div>' : '');
         el.appendChild(head);
 
-        // Body (attachments)
         const body = document.createElement("div");
         (p.attachments||[]).forEach(a=>{
           const ct = (a.contentType||"").toLowerCase();
@@ -309,14 +257,13 @@
         });
         el.appendChild(body);
 
-        // Admin actions
         if (isAdmin()){
           const doPin = el.querySelector('[data-act="pin"]');
           const doUnpin = el.querySelector('[data-act="unpin"]');
           const doDel = el.querySelector('[data-act="del"]');
-          if (doPin)   doPin.onclick   = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"POST", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } }).then(()=>loadPosts());
-          if (doUnpin) doUnpin.onclick = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } }).then(()=>loadPosts());
-          if (doDel)   doDel.onclick   = ()=> { if (confirm("Delete this post?")) fetch(POSTS_API+'/'+p.id, { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } }).then(()=>loadPosts()); };
+          if (doPin)   doPin.onclick   = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"POST", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN } }).then(()=>loadPosts());
+          if (doUnpin) doUnpin.onclick = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"DELETE", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN } }).then(()=>loadPosts());
+          if (doDel)   doDel.onclick   = ()=> { if (confirm("Delete this post?")) fetch(POSTS_API+'/'+p.id, { method:"DELETE", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN } }).then(()=>loadPosts()); };
         }
 
         feed.appendChild(el);
