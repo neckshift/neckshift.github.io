@@ -22,12 +22,10 @@
       --card: rgba(48,48,48,0.6);
       --border: rgba(255,255,255,0.1);
       --btn-border:#888;
-      --btn-bg-r:43;  /* 2b */
-      --btn-bg-g:43;
-      --btn-bg-b:43;
-      --btn-bg-alpha:0.30;    /* 30% de fond */
-      --btn-bg-hover-alpha:0.60;
+      --btn-bg-r:43; --btn-bg-g:43; --btn-bg-b:43;
+      --btn-bg-alpha:0.30; --btn-bg-hover-alpha:0.60;
       --btn-text:#e9e9e9;
+      --accent:#9fd;
     }
 
     body {
@@ -50,303 +48,304 @@
       align-items: center;
     }
 
-    .section h2 {
-      color: var(--muted);
-      font-size: 24px;
-      margin-top: 40px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-
-    .section p {
-      margin: 24px auto;
-      max-width: 80ch;
-      font-size: 17px;
-      line-height: 1.6;
-      text-align: left;
-      color: var(--muted);
-    }
-
     /* Boutons de téléchargement – largeur de la bulle, fond transparent 30% */
     .download-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;               /* pleine largeur de la bulle */
-      height: 70px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; height: 70px;
       background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha));
-      color: var(--btn-text);    /* texte 100% opaque */
-      text-decoration: none;
-      border-radius: 12px;
-      text-align: center;
-      font-size: 18px;
+      color: var(--btn-text); text-decoration: none; border-radius: 12px; text-align: center; font-size: 18px;
       border: 1.5px solid var(--btn-border);
       transition: transform .08s ease, background .2s ease, border-color .2s ease;
-      cursor: pointer;
-      font-weight: 600;
-      letter-spacing: .2px;
+      cursor: pointer; font-weight: 600; letter-spacing: .2px;
     }
-    .download-button:hover {
-      background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha));
-      border-color: #9a9a9a;
-      transform: translateY(-1px);
-    }
-    .download-button .sub {
-      display:block;
-      font-size:12px;
-      opacity:.9;
-      font-weight:500;
-      letter-spacing:.3px;
-      line-height:1;
-    }
-    .download-button svg{
-      width:22px;height:22px;flex:none;opacity:1;
-    }
+    .download-button:hover { background: rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha)); border-color: #9a9a9a; transform: translateY(-1px); }
+    .download-button .sub { display:block; font-size:12px; opacity:.9; font-weight:500; letter-spacing:.3px; line-height:1; }
+    .download-button svg{ width:22px;height:22px;flex:none;opacity:1; }
 
-    /* Barre de menu – largeur de la bulle */
-    .menu-bar-wrap{
-      width: 100%;
-    }
+    /* Barre de menu */
+    .menu-bar-wrap{ width: 100%; }
     .menu-bar {
-      width: 100%;               /* occupe la largeur de la bulle */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin: 0;                 /* plus de liseret en dessous */
-      flex-wrap: wrap;
+      width: 100%; display: flex; justify-content: center; align-items: center; gap: 16px; margin: 0; flex-wrap: wrap;
     }
-    .menu-button, .kofi-button {
-      padding: 10px 16px;
-      background: none;
-      color: var(--muted);
-      border: 1px solid var(--btn-border);
-      border-radius: 10px;
-      text-decoration: none;
+    .menu-button, .kofi-button, .admin-button {
+      padding: 10px 16px; background: none; color: var(--muted);
+      border: 1px solid var(--btn-border); border-radius: 10px; text-decoration: none;
       transition: background .2s ease, color .2s ease, border-color .2s ease;
-      font-size: 15px;
-      line-height: 1;
+      font-size: 15px; line-height: 1; cursor:pointer;
     }
-    .menu-button:hover, .kofi-button:hover {
-      background: #555;
-      color: #fff;
-      border-color: #9a9a9a;
-    }
-
-    .lang-switch {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--btn-border);
-      border-radius: 10px;
-      padding: 6px 10px;
-      background: none;
-    }
-    .lang-switch button{
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    .lang-switch button.active{
-      background: #505050;
-      color: #fff;
-    }
-    .lang-switch svg{width:18px;height:18px;opacity:.9}
+    .menu-button:hover, .kofi-button:hover, .admin-button:hover { background: #555; color: #fff; border-color: #9a9a9a; }
+    .admin-on { color: #111 !important; background: var(--accent) !important; border-color: var(--accent) !important; }
 
     @media (max-width: 768px) {
-      .section {
-        padding: 0 10px !important;
-        margin-top: 30px !important;
-      }
-
-      .section > div {
-        padding: 30px 20px !important;
-      }
-
-      .section > div > div:first-child {
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 30px !important;
-      }
-
-      .section img {
-        width: 200px !important;
-        height: 200px !important;
-      }
-
-      .download-button {
-        height: 60px !important;
-        font-size: 17px !important;
-      }
-
-      .section h2 { text-align: center; }
-      .section p { text-align: left; padding: 0 10px; }
-      .section-title { text-align: center !important; }
+      .section { padding: 0 10px !important; margin-top: 30px !important; }
+      .section > div { padding: 30px 20px !important; }
+      .section > div > div:first-child { flex-direction: column !important; align-items: center !important; gap: 30px !important; }
+      .section img { width: 200px !important; height: 200px !important; }
+      .download-button { height: 60px !important; font-size: 17px !important; }
     }
 
-    .section-title { text-align: left; }
+    .background { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
+    .background img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4); will-change: transform, filter; pointer-events: none; user-select: none; }
 
-    .background {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      z-index: -1; overflow: hidden;
+    /* Carte principale */
+    .card {
+      background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 24px;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);
     }
-    .background img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      filter: brightness(0.4);
-      will-change: transform, filter;
-      pointer-events: none; user-select: none;
+
+    /* Admin inline panel */
+    .admin-panel {
+      display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
+      border:1px solid var(--btn-border); border-radius:12px; padding:10px; background: rgba(0,0,0,.2);
     }
+    .admin-panel input[type="password"], .admin-panel input[type="text"] {
+      background: transparent; border: 1px solid rgba(255,255,255,.25); color: #eee; border-radius: 8px; padding: 8px 10px;
+    }
+    .admin-panel .publish {
+      display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px;
+    }
+    .admin-panel .publish input[type="file"] { width:100%; }
+
+    /* Feed */
+    #feed { display:flex; flex-direction:column; gap:12px; }
+    .post {
+      border:1px solid var(--border); background: rgba(255,255,255,.04);
+      border-radius: 12px; padding: 12px;
+    }
+    .post-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .post-title { color:#e8dfdf; font-weight:600; }
+    .post-time { color:#9e9e9e; font-size: 0.92rem; margin-left:8px; }
+    .post-actions button { padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
+    .post-actions button:hover { background:#555; color:#fff; border-color:#9a9a9a; }
+    .post img { max-width:100%; border-radius:12px; margin:8px 0; cursor:zoom-in; }
+    .post video { width:100%; border-radius:12px; margin:8px 0; }
+
+    /* Lightbox très léger */
+    #lightbox { position:fixed; inset:0; background:rgba(0,0,0,.9); display:none; align-items:center; justify-content:center; z-index:9999; }
+    #lbContent { max-width:92vw; max-height:92vh; }
+    #lbClose { position:absolute; top:12px; right:12px; padding:6px 10px; border-radius:8px; border:1px solid #fff; background:transparent; color:#fff; cursor:pointer; }
   </style>
 </head>
 <body>
-  <div class="background">
-    <img src="createbackground.png" alt="Fond d'écran">
-  </div>
+  <div class="background"><img src="createbackground.png" alt="Fond d'écran"></div>
 
   <div class="section">
-    <div style="background-color: var(--card); border-radius: 16px; padding: 60px 60px 20px 60px; max-width: 1000px; display: flex; flex-direction: column; gap: 32px;  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border);">
-      
-      <!-- Top / Hero (boutons = largeur bulle) -->
+    <div class="card">
+      <!-- Top / Hero -->
       <div style="display: flex; align-items: center; justify-content: flex-start; gap: 40px; flex-wrap: wrap; width:100%;">
         <img src="NSicon2.png" alt="NeckShift Favicon" style="width: 320px; height: 320px; border-radius: 44px; image-rendering: -webkit-optimize-contrast; transform: translateZ(0); backface-visibility: hidden; border: 2px solid #888;">
         <div class="download-button-wrapper" style="display:flex; flex-direction:column; gap:16px; align-items:center; flex:1; width:100%;">
           <!-- Windows -->
           <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShiftSetup.exe" class="download-button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
-            <span>
-              Download for Windows
-              <span class="sub">NeckShift v1 · .exe</span>
-            </span>
+            <span>Download for Windows <span class="sub">NeckShift v1 · .exe</span></span>
           </a>
           <!-- macOS -->
           <a href="https://github.com/neckshift/NeckShift/releases/download/v1.0/NeckShift.dmg" class="download-button">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3v10.586l3.293-3.293 1.414 1.414L12 17.414l-4.707-4.707 1.414-1.414L11 13.586V3h1zM5 19h14v2H5z"/></svg>
-            <span>
-              Download for macOS
-              <span class="sub">NeckShift v1 · .dmg</span>
-            </span>
+            <span>Download for macOS <span class="sub">NeckShift v1 · .dmg</span></span>
           </a>
         </div>
       </div>
 
-      <!-- MENU (au-dessus, sans liseret en dessous) -->
+      <!-- MENU -->
       <div class="menu-bar-wrap">
         <div class="menu-bar">
           <a href="https://neckshift.github.io/comments" class="menu-button">Comments</a>
           <a href="https://ko-fi.com/anatomiesonore" target="_blank" rel="noopener noreferrer" class="kofi-button">Support me on Ko-Fi</a>
-          <div class="lang-switch" aria-label="Language">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2m7.93 8h-3.18a15.7 15.7 0 00-1.2-5A8.021 8.021 0 0119.93 10M12 4a13.7 13.7 0 011.77 6H10.23A13.7 13.7 0 0112 4M4.07 10A8.021 8.021 0 0110.38 5a15.7 15.7 0 00-1.2 5H4.07m0 4h3.18a15.7 15.7 0 001.2 5A8.021 8.021 0 014.07 14M12 20a13.7 13.7 0 01-1.77-6h3.54A13.7 13.7 0 0112 20m1.62-.38a15.7 15.7 0 001.2-5h3.18a8.021 8.021 0 01-4.38 5M7 14a13.7 13.7 0 01-.23-2c0-.68.08-1.34.23-2h10a13.7 13.7 0 01.23 2 13.7 13.7 0 01-.23 2z"/></svg>
-            <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
-            <button type="button" id="btn-fr" onclick="setLang('fr')">Français</button>
-          </div>
+          <!-- Admin remplace l'ancien switch de langue -->
+          <button id="adminToggle" class="admin-button" title="Enter admin password">Admin</button>
         </div>
-        <!-- liseret supprimé ici -->
       </div>
 
-      <!-- CONTENU -->
-      <div>
-        <!-- English (default) -->
-        <div id="content-en">
-          <h2 class="section-title"><em>What is NeckShift?</em></h2>
-          <p>NeckShift is a free software designed to explore the fretboard through selections of notes and related scales — interactively.</p>
-          <p>It’s meant for curious beginners who want to understand their instrument and scales, as well as advanced musicians who want a simple tool to compose or explore more complex structures.</p>
-          <p>The interface is smooth and entirely offline. NeckShift uses English musical notation and requires no complex setup — just run it.</p>
+      <!-- ADMIN PANEL + PUBLISHER (apparait uniquement en mode admin) -->
+      <div id="adminPanel" class="admin-panel">
+        <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
+        <button id="adminUse" class="admin-button">Use</button>
+        <button id="adminCancel" class="admin-button">Cancel</button>
 
-          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
-
-          <h2 class="section-title"><em>Main Features</em></h2>
-          <p><strong>Compose from what you play</strong>: Select the notes from a riff or chord you just played and instantly discover compatible scales — let the tool guide you.</p>
-          <p><strong>Works with any tuning</strong>: Enter your tuning, including non-standard ones (Drop C, Open G, etc.). You can switch tunings on the fly and everything updates in real time.</p>
-          <p><strong>Interval display</strong>: Visualize scales on the fretboard in note-name or interval mode and switch with a click.</p>
-          <p><strong>Visual scale comparison</strong>: Selected scales appear in blue, hovered scales lighter — differences pop immediately.</p>
-          <p><strong>Learning mode</strong>: Display all scales without having to play anything, perfect for quick practice and visualization.</p>
-
-          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
-
-          <h2 class="section-title"><em>Dev Note</em></h2>
-          <p>I labeled this release as v1 because it marks an important milestone in the project.</p>
-          <p><strong><em>Next planned feature</em></strong>: tuning slots. Save several custom tunings with names and recall them in one click — standard, drop D, an open tuning for slide, etc.</p>
-          <p>Developed in my free time, NeckShift took a lot of work and energy — especially debugging — and I’m not a developer. It’s a personal project I try to improve when I can.</p>
-          <p>It now feels stable, clear, and useful enough to share. Please send feedback, suggestions, or report any issues on the comments page.</p>
+        <div id="publisher" class="publish">
+          <input id="postTitle" type="text" placeholder="Titre (optionnel)" maxlength="200" style="width:100%;margin-bottom:8px;">
+          <input id="postFiles" type="file" multiple accept="image/*,video/mp4,video/*,.pdf,.zip,.doc,.docx,.ppt,.pptx,.xls,.xlsx" style="margin-bottom:8px;">
+          <button id="postPublish" class="admin-button" style="border-color:#aaa;">Publier</button>
+          <span id="postStatus" style="margin-left:8px;opacity:.8;"></span>
         </div>
-
-        <!-- Français (original) -->
-        <div id="content-fr" style="display:none;">
-          <h2 class="section-title"><em>Qu'est-ce que NeckShift ?</em></h2>
-          <p>NeckShift est un logiciel gratuit conçu pour explorer le manche via des selections de notes et de gammes associées, le tout de façon interactive.</p>
-          <p>Ce logiciel s’adresse à la fois aux guitaristes débutants curieux de comprendre leur instrument et les gammes, jusqu'aux musiciens avancés désireux d'un outil simple pour composer ou explorer des structures plus complexes.</p>
-          <p>L’interface est pensée pour être fluide, et entièrement hors ligne. NeckShift utilise la notation musicale anglaise et ne nécessite aucune installation complexe : il suffit de le lancer.</p>
-
-          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
-
-          <h2 class="section-title"><em>Fonctionnalités principales</em></h2>
-          <p><strong>Compose à partir de ce que tu joues</strong> : sélectionne les notes d’un riff ou d’un accord que tu viens de jouer, et découvre instantanément les gammes compatibles. Plus besoin de théoriser à l’oreille ou de rechercher quelle gammes sont compatible sur internet — laisse l’outil te guider.</p>
-          <p><strong>Compatible avec tous les accordages</strong> : entre ton accordage, même non standard (Drop C, Open G, etc.), et l’outil adapte automatiquement les gammes affichées. Tu peux même changer d’accordage à la volée : tout se met à jour en temps réel.</p>
-          <p><strong>Affichage des Intervalles</strong> : visualise les gammes sur le manche en mode nom des notes ou en mode intervalles. Tu switches entre les deux en un clic. Très utile pour comprendre la structure d’une gamme ou l’expliquer en cours.</p>
-          <p><strong>Comparaison visuelle des gammes</strong> : les gammes sélectionnées sont affichées en bleu, les gammes survolées en plus clair. Tu vois immédiatement ce qui change d'une gamme à l'autre. Parfait pour l’analyse ou l’apprentissage.</p>
-          <p><strong>Mode apprentissage</strong> : affiche simplement toutes les gammes, sans avoir besoin de jouer quoi que ce soit sur le manche. Si tu veux juste bosser tes gammes et les visualiser rapidement </p>
-
-          <hr style="border: none; border-top: 1px solid var(--line); margin: 40px 0;">
-
-          <h2 class="section-title"><em>Note Dev</em></h2>
-          <p>J’ai choisi de désigner cette version comme la v1 car elle marque une étape importante dans le développement du projet.</p>
-          <p><strong><em>Prochain ajout prévu</em></strong> : un système de slots d’accordage. L’idée, c’est de pouvoir enregistrer plusieurs accordages personnalisés, leur filer un petit nom, et les retrouver en un clic. Genre t’as ton accordage standard, un drop D, un open tuning pour slide, etc. — tu les as tous sous la main sans devoir les retaper à chaque fois. Ça rendra le truc beaucoup plus fluide pour ceux qui switchent souvent entre plusieurs setups. </p>
-          <p>Développé sur mon temps libre, NeckShift m’a demandé beaucoup de travail et d’énergie, surtout pour débuguer des trucs alors que — faut le dire — je ne suis pas développeur. C’est un projet perso qui me tient à cœur, que j’essaie de faire évoluer quand j’ai le temps. Je ne peux pas promettre de dates pour les ajouts, mais j’y bosse petit à petit.</p>
-          <p>Il m’a semblé aujourd’hui suffisamment stable, clair et utile pour que je puisse le partager avec vous. N’hésitez pas à me faire part de vos retours, de vos suggestions ou à me signaler des problème éventuels que vous rencontrez, dans la page commentaires.</p>
-        </div>
-
       </div>
+
+      <!-- FEED -->
+      <div id="feed"></div>
     </div>
   </div>
 
-  <!-- Footer (i18n) -->
+  <!-- Lightbox -->
+  <div id="lightbox"><button id="lbClose">Close</button><div id="lbContent"></div></div>
+
+  <!-- Footer (licence conservée) -->
   <footer style="margin-top: -20px; margin-bottom: 40px; font-size: 13px;">
-    <span id="foot-en">Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Integrates Tonal.js · MIT · © 2018 Danigb</span>
-    <span id="foot-fr" style="display:none;">Sous licence | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Intègre Tonal.js · MIT · © 2018 Danigb</span>
+    <span>Licensed | NeckShift · CC BY-NC-ND 4.0 · © 2025 Anatomie Sonore | Integrates Tonal.js · MIT · © 2018 Danigb</span>
   </footer>
 
   <script>
-    function setLang(lang){
-      const en = document.getElementById('content-en');
-      const fr = document.getElementById('content-fr');
-      const footEn = document.getElementById('foot-en');
-      const footFr = document.getElementById('foot-fr');
-      const btnEn = document.getElementById('btn-en');
-      const btnFr = document.getElementById('btn-fr');
+    // === CONFIG API ===
+    const API_BASE = "https://neckshift-comments.brd-louu.workers.dev"; // ton worker
+    const POSTS_API = API_BASE + "/posts";
+    const MEDIA_BASE = API_BASE + "/media/";
 
-      if(lang === 'fr'){
-        document.documentElement.lang = 'fr';
-        en.style.display = 'none';
-        fr.style.display = '';
-        footEn.style.display = 'none';
-        footFr.style.display = '';
-        btnEn.classList.remove('active');
-        btnFr.classList.add('active');
+    // === ADMIN UI (comme sur comments) ===
+    let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
+    const adminToggle = document.getElementById("adminToggle");
+    const adminPanel  = document.getElementById("adminPanel");
+    const adminPwd    = document.getElementById("adminPassword");
+    const adminUse    = document.getElementById("adminUse");
+    const adminCancel = document.getElementById("adminCancel");
+    const publisher   = document.getElementById("publisher");
+    function isAdmin(){ return !!ADMIN_TOKEN; }
+    function refreshAdminUI(){
+      // bouton header
+      adminToggle.classList.toggle("admin-on", isAdmin());
+      adminToggle.textContent = isAdmin() ? "Admin: ON" : "Admin";
+      // panneau
+      if (isAdmin()){
+        adminPanel.style.display = "flex";
+        publisher.style.display = "block"; // -> pousse le feed vers le bas
       } else {
-        document.documentElement.lang = 'en';
-        en.style.display = '';
-        fr.style.display = 'none';
-        footEn.style.display = '';
-        footFr.style.display = 'none';
-        btnFr.classList.remove('active');
-        btnEn.classList.add('active');
+        // ferme la zone de login + masque publisher
+        document.getElementById("adminPassword").value="";
+        adminPanel.style.display = "none";
+        publisher.style.display = "none"; // -> le feed remonte
       }
-      try { localStorage.setItem('ns_lang', lang); } catch(e){}
+    }
+    adminToggle.addEventListener("click", ()=>{
+      if (isAdmin()){
+        if (confirm("Disable admin mode?")){
+          ADMIN_TOKEN=""; sessionStorage.removeItem("ns_admin_token");
+          refreshAdminUI(); loadPosts();
+        }
+      } else {
+        // affiche juste la barre de login (sans publisher)
+        adminPanel.style.display="flex";
+        publisher.style.display="none";
+        adminPwd.value=""; adminPwd.focus();
+      }
+    });
+    adminUse.addEventListener("click", ()=>{
+      const t = adminPwd.value.trim(); if (!t) return;
+      fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer "+t } })
+        .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(x=>{
+          if(!x.ok || !x.j.ok){ alert("Wrong password"); return; }
+          ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
+          refreshAdminUI(); loadPosts();
+        }).catch(()=>alert("Network error"));
+    });
+    adminCancel.addEventListener("click", ()=>{
+      adminPanel.style.display="none"; adminPwd.value=""; publisher.style.display="none";
+    });
+    refreshAdminUI();
+
+    // === PUBLISH ===
+    document.getElementById("postPublish").addEventListener("click", ()=>{
+      const st = document.getElementById("postStatus");
+      st.textContent = "";
+      if (!isAdmin()){ st.textContent = "Admin only."; return; }
+
+      const fd = new FormData();
+      fd.append("title", (document.getElementById("postTitle").value||"").trim());
+      const files = document.getElementById("postFiles").files;
+      for (let i=0;i<files.length;i++) fd.append("files", files[i]);
+
+      fetch(POSTS_API, { method:"POST", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN" }, body: fd })
+        .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(x=>{
+          if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
+          document.getElementById("postTitle").value=""; document.getElementById("postFiles").value="";
+          st.textContent = "";
+          loadPosts();
+        }).catch(()=>{ st.textContent="Network error"; });
+    });
+
+    // === FEED RENDER ===
+    const feed = document.getElementById("feed");
+
+    function esc(s){return (s||"").replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+    function fmtDate(iso){ try{ return new Date(iso||Date.now()).toLocaleString(); } catch(e){ return ""; } }
+
+    function renderPosts(items){
+      feed.innerHTML = "";
+      (items||[]).forEach(p=>{
+        const el = document.createElement("div");
+        el.className = "post";
+
+        // Header
+        const head = document.createElement("div");
+        head.className = "post-head";
+        head.innerHTML =
+          '<div><span class="post-title">'+esc(p.title||"(no title)")+'</span>'+
+          '<span class="post-time">'+fmtDate(p.created_at)+'</span>'+
+          (p.pinned ? ' <span title="pinned">📌</span>' : '')+
+          '</div>'+
+          (isAdmin()? '<div class="post-actions">'+
+            (p.pinned? '<button data-act="unpin">Unpin</button>' : '<button data-act="pin">Pin</button>')+
+            ' <button data-act="del">Delete</button></div>' : '');
+        el.appendChild(head);
+
+        // Body (attachments)
+        const body = document.createElement("div");
+        (p.attachments||[]).forEach(a=>{
+          const ct = (a.contentType||"").toLowerCase();
+          const url = MEDIA_BASE + encodeURIComponent(a.key);
+          if (ct.startsWith("image/")){
+            const img = document.createElement("img");
+            img.src = url; img.alt = a.name || "";
+            img.addEventListener("click", ()=> openLightbox(url));
+            body.appendChild(img);
+          } else if (ct.startsWith("video/")){
+            const vid = document.createElement("video");
+            vid.src = url; vid.controls = true;
+            body.appendChild(vid);
+          } else {
+            const link = document.createElement("a");
+            link.href = url; link.target="_blank"; link.rel="noopener"; link.textContent = a.name || "file";
+            body.appendChild(link);
+          }
+        });
+        el.appendChild(body);
+
+        // Admin actions
+        if (isAdmin()){
+          const doPin = el.querySelector('[data-act="pin"]');
+          const doUnpin = el.querySelector('[data-act="unpin"]');
+          const doDel = el.querySelector('[data-act="del"]');
+          if (doPin)   doPin.onclick   = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"POST", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } }).then(()=>loadPosts());
+          if (doUnpin) doUnpin.onclick = ()=> fetch(POSTS_API+'/'+p.id+'/pin', { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } }).then(()=>loadPosts());
+          if (doDel)   doDel.onclick   = ()=> { if (confirm("Delete this post?")) fetch(POSTS_API+'/'+p.id, { method:"DELETE", headers:{ "Authorization":"Bearer "+ADMIN_TOKEN } }).then(()=>loadPosts()); };
+        }
+
+        feed.appendChild(el);
+      });
     }
 
-    (function(){
-      let lang = 'en';
-      try { lang = localStorage.getItem('ns_lang') || 'en'; } catch(e){}
-      setLang(lang);
-    })();
+    function loadPosts(){
+      fetch(POSTS_API, { cache:"no-store" })
+        .then(r=>r.json())
+        .then(renderPosts)
+        .catch(console.error);
+    }
+
+    // Lightbox ultra simple
+    const lb = document.getElementById("lightbox");
+    const lbContent = document.getElementById("lbContent");
+    const lbClose = document.getElementById("lbClose");
+    function openLightbox(src){
+      lbContent.innerHTML = "";
+      const img = document.createElement("img");
+      img.src = src; img.style.maxWidth="92vw"; img.style.maxHeight="92vh";
+      lbContent.appendChild(img);
+      lb.style.display = "flex";
+    }
+    lbClose.onclick = ()=> { lb.style.display="none"; };
+    lb.addEventListener("click", (e)=>{ if (e.target === lb) lb.style.display="none"; });
+
+    // Init
+    loadPosts();
   </script>
 </body>
 </html>
