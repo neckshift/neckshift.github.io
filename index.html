@@ -21,55 +21,68 @@
       --btn-bg-alpha:0.30; --btn-bg-hover-alpha:0.60; --btn-text:#e9e9e9;
       --accent:#9fd;
     }
-    body{ margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-      background-color:var(--bg); color:var(--text); text-align:center; line-height:1.8; font-size:16px; }
+    body{
+      margin:0; font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background-color:var(--bg); color:var(--text); text-align:center; line-height:1.8; font-size:16px;
+    }
     .section{ max-width:100%; margin:30px auto 60px; padding:0 40px; text-align:left; display:flex; flex-direction:column; align-items:center; }
-    .card{ background-color:var(--card); border-radius:16px; padding:60px 60px 20px 60px; max-width:1000px;
-      display:flex; flex-direction:column; gap:24px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid var(--border); }
-    .download-button{ display:inline-flex; align-items:center; justify-content:center; gap:10px; width:100%; height:70px;
+
+    /* Bulle élargie */
+    .card{
+      background-color:var(--card); border-radius:16px;
+      padding:60px 60px 20px 60px;
+      max-width:1200px; /* élargi */
+      width:100%;
+      display:flex; flex-direction:column; gap:24px;
+      backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+      border:1px solid var(--border);
+    }
+
+    .download-button{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px; width:100%; height:70px;
       background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-alpha)); color:var(--btn-text); text-decoration:none;
-      border-radius:12px; text-align:center; font-size:18px; border:1.5px solid var(--btn-border); transition:transform .08s ease,background .2s,border-color .2s;
-      cursor:pointer; font-weight:600; letter-spacing:.2px; }
+      border-radius:12px; text-align:center; font-size:18px; border:1.5px solid var(--btn-border);
+      transition:transform .08s ease, background .2s ease, border-color .2s ease; cursor:pointer; font-weight:600; letter-spacing:.2px;
+    }
     .download-button:hover{ background:rgba(var(--btn-bg-r),var(--btn-bg-g),var(--btn-bg-b),var(--btn-bg-hover-alpha)); border-color:#9a9a9a; transform:translateY(-1px); }
     .download-button .sub{ display:block; font-size:12px; opacity:.9; font-weight:500; letter-spacing:.3px; line-height:1; }
     .download-button svg{ width:22px; height:22px; flex:none; opacity:1; }
+
     .menu-bar-wrap{ width:100%; }
     .menu-bar{ width:100%; display:flex; justify-content:center; align-items:center; gap:16px; margin:0; flex-wrap:wrap; }
     .menu-button,.kofi-button,.admin-button{
       padding:10px 16px; background:none; color:var(--muted); border:1px solid var(--btn-border); border-radius:10px; text-decoration:none;
-      transition:background .2s ease, color .2s ease, border-color .2s ease; font-size:15px; line-height:1; cursor:pointer; }
+      transition:background .2s, color .2s, border-color .2s; font-size:15px; line-height:1; cursor:pointer;
+    }
     .menu-button:hover,.kofi-button:hover,.admin-button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
     .admin-on{ color:#111 !important; background:var(--accent) !important; border-color:var(--accent) !important; }
+
     .background{ position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; overflow:hidden; }
     .background img{ width:100%; height:100%; object-fit:cover; filter:brightness(0.4); will-change:transform,filter; pointer-events:none; user-select:none; }
 
-    /* Admin panel + publisher */
-    .admin-panel{ display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
-      border:1px solid var(--btn-border); border-radius:12px; padding:10px; background:rgba(0,0,0,.2); }
+    /* Admin */
+    .admin-panel{
+      display:none; gap:10px; align-items:center; justify-content:flex-start; flex-wrap:wrap;
+      border:1px solid var(--btn-border); border-radius:12px; padding:10px; background:rgba(0,0,0,.2);
+    }
     .admin-panel input[type="password"]{
-      background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px;
-      min-width:220px;
+      background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px; min-width:220px;
     }
 
     .publish{ display:none; width:100%; border-top:1px solid var(--border); margin-top:8px; padding-top:8px; }
-    .publish .row{
-      display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:start; /* texte à gauche, icône fichier à droite */
+    .publish .row{ display:grid; grid-template-columns: 1fr 220px; gap:12px; align-items:start; }
+    .publish input[type="text"], .publish textarea{
+      width:100%; background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:10px 12px;
     }
-    .publish input[type="text"]{
-      width:100%; background:transparent; border:1px solid rgba(255,255,255,.25); color:#eee; border-radius:8px; padding:8px 10px;
-    }
-    .publish textarea{
-      width:100%; min-height:110px; resize:vertical; background:transparent; border:1px solid rgba(255,255,255,.25);
-      color:#eee; border-radius:8px; padding:10px 12px; line-height:1.5;
-    }
+    .publish textarea{ min-height:120px; resize:vertical; line-height:1.55; }
+    .side-col{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
     .file-mini{
       display:inline-flex; align-items:center; justify-content:center; gap:6px;
-      border:1px solid var(--btn-border); border-radius:8px; padding:8px 10px; cursor:pointer; background:none; color:var(--muted);
-      height:42px;
+      border:1px solid var(--btn-border); border-radius:8px; padding:10px 12px; cursor:pointer; background:none; color:var(--muted); height:44px;
     }
     .file-mini:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
-    .file-mini small{ opacity:.85; }
     #postFiles{ display:none; } /* input natif masqué */
+    #postStatus{ opacity:.85; }
 
     /* Feed */
     #feed{ display:flex; flex-direction:column; gap:12px; }
@@ -80,15 +93,12 @@
     .post-actions button{ padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
     .post-actions button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
 
-    /* corps du post : gauche texte, droite médias */
-    .post-body{
-      display:grid; grid-template-columns: 1fr 320px; gap:12px; align-items:start;
-    }
+    /* Corps du post : texte à gauche, médias à droite (taille fixe) */
+    .post-body{ display:grid; grid-template-columns: 1fr 360px; gap:12px; align-items:start; }
     .post-text{ white-space:pre-wrap; line-height:1.55; color:#dcd5d5; }
     .media-col{ display:flex; flex-direction:column; gap:8px; }
     .media-col img, .media-col video{
-      width:100%; max-height:260px; object-fit:cover; border-radius:12px; display:block;
-      background:#111;
+      width:100%; max-height:280px; object-fit:cover; border-radius:12px; display:block; background:#111;
     }
 
     /* Lightbox */
@@ -96,13 +106,16 @@
     #lbContent{ max-width:92vw; max-height:92vh; }
     #lbClose{ position:absolute; top:12px; right:12px; padding:6px 10px; border-radius:8px; border:1px solid #fff; background:transparent; color:#fff; cursor:pointer; }
 
+    @media (max-width: 900px){
+      .publish .row{ grid-template-columns: 1fr; }
+      .post-body{ grid-template-columns: 1fr; }
+    }
     @media (max-width: 768px){
       .section{ padding:0 10px !important; margin-top:30px !important; }
       .card{ padding:30px 20px !important; }
       .card > div:first-child{ flex-direction:column !important; align-items:center !important; gap:30px !important; }
       .card img{ width:200px !important; height:200px !important; }
       .download-button{ height:60px !important; font-size:17px !important; }
-      .post-body{ grid-template-columns: 1fr; } /* stack sur mobile */
     }
   </style>
 </head>
@@ -135,28 +148,27 @@
         </div>
       </div>
 
-      <!-- ADMIN PANEL + PUBLISHER -->
+      <!-- ADMIN PANEL -->
       <div id="adminPanel" class="admin-panel">
-        <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
-        <button id="adminUse" class="admin-button">Use</button>
-        <button id="adminCancel" class="admin-button">Cancel</button>
+        <!-- login group séparé pour ne cacher que lui -->
+        <div id="adminLogin" style="display:flex; gap:10px; align-items:center;">
+          <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
+          <button id="adminUse" class="admin-button">Use</button>
+          <button id="adminCancel" class="admin-button">Cancel</button>
+        </div>
 
+        <!-- Publisher -->
         <div id="publisher" class="publish">
           <div class="row">
             <div>
               <input id="postTitle" type="text" placeholder="Titre (optionnel)" maxlength="200" style="margin-bottom:8px;">
               <textarea id="postBody" placeholder="Écris ton texte…" maxlength="3000"></textarea>
             </div>
-
-            <!-- bouton fichier minimaliste -->
-            <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+            <div class="side-col">
               <input id="postFiles" type="file" multiple accept="image/*,video/mp4,video/*,.pdf,.zip,.doc,.docx,.ppt,.pptx,.xls,.xlsx">
-              <label for="postFiles" class="file-mini" id="fileBtn">
-                <span>📎</span><small id="fileCount">0</small>
-              </label>
-
+              <label for="postFiles" class="file-mini" id="fileBtn"><span>📎</span><small id="fileCount">0</small></label>
               <button id="postPublish" class="admin-button" style="border-color:#aaa;">Publier</button>
-              <span id="postStatus" style="opacity:.8;"></span>
+              <span id="postStatus"></span>
             </div>
           </div>
         </div>
@@ -180,10 +192,11 @@
     const POSTS_API = API_BASE + "/posts";
     const MEDIA_BASE = API_BASE + "/media/";
 
-    // === ADMIN UI ===
+    // === ADMIN UI (fix: ne cacher que le bloc login) ===
     let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
     const adminToggle = document.getElementById("adminToggle");
     const adminPanel  = document.getElementById("adminPanel");
+    const adminLogin  = document.getElementById("adminLogin");
     const adminPwd    = document.getElementById("adminPassword");
     const adminUse    = document.getElementById("adminUse");
     const adminCancel = document.getElementById("adminCancel");
@@ -194,21 +207,14 @@
       adminToggle.classList.toggle("admin-on", isAdmin());
       adminToggle.textContent = isAdmin() ? "Admin: ON" : "Admin";
       if (isAdmin()){
-        // en mode admin: on cache le login et on montre uniquement l'éditeur
         adminPanel.style.display = "flex";
-        adminPwd.parentElement.style.display = "none";      // cache zone login
-        adminUse.style.display = "none";
-        adminCancel.style.display = "none";
-        publisher.style.display = "block";
+        adminLogin.style.display = "none";
+        publisher.style.display  = "block";   // pousse le feed
       } else {
-        // quand pas admin: le panneau est masqué
         adminPanel.style.display = "none";
-        publisher.style.display = "none";
+        adminLogin.style.display = "flex";
+        publisher.style.display  = "none";    // le feed remonte
         adminPwd.value = "";
-        // réaffiche les contrôles de login au prochain clic
-        adminPwd.parentElement && (adminPwd.parentElement.style.display = "");
-        adminUse.style.display = "";
-        adminCancel.style.display = "";
       }
     }
 
@@ -219,30 +225,34 @@
           refreshAdminUI(); loadPosts();
         }
       } else {
-        // montre le panneau avec la zone de login, éditeur masqué
-        adminPanel.style.display="flex";
-        adminPwd.parentElement.style.display = ""; // assure visible
-        adminUse.style.display = "";
-        adminCancel.style.display = "";
-        publisher.style.display="none";
-        adminPwd.value=""; adminPwd.focus();
+        adminPanel.style.display = "flex";
+        adminLogin.style.display = "flex";
+        publisher.style.display  = "none";
+        adminPwd.value = ""; adminPwd.focus();
       }
     });
+
     adminUse.addEventListener("click", ()=>{
       const t = adminPwd.value.trim(); if (!t) return;
       fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer " + t } })
-        .then(r=>r.json().then(j=>({ok:r.ok,j}))).then(x=>{
+        .then(r=>r.json().then(j=>({ok:r.ok,j}))))
+        .then(x=>{
           if(!x.ok || !x.j.ok){ alert("Wrong password"); return; }
           ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
           refreshAdminUI(); loadPosts();
-        }).catch(()=>alert("Network error"));
+        })
+        .catch(()=>alert("Network error"));
     });
+
     adminCancel.addEventListener("click", ()=>{
-      adminPanel.style.display="none"; adminPwd.value=""; publisher.style.display="none";
+      adminPanel.style.display = "none";
+      adminPwd.value = "";
+      publisher.style.display  = "none";
     });
+
     refreshAdminUI();
 
-    // petit compteur fichiers
+    // compteur fichiers
     const fileInput = document.getElementById('postFiles');
     const fileCount = document.getElementById('fileCount');
     fileInput.addEventListener('change', ()=>{ fileCount.textContent = String(fileInput.files.length||0); });
@@ -255,7 +265,7 @@
 
       const fd = new FormData();
       fd.append("title", (document.getElementById("postTitle").value||"").trim());
-      fd.append("body",  (document.getElementById("postBody").value||"").trim()); // <-- texte
+      fd.append("body",  (document.getElementById("postBody").value||"").trim());
       const files = fileInput.files;
       for (let i=0;i<files.length;i++) fd.append("files", files[i]);
 
@@ -272,7 +282,7 @@
       .catch(()=>{ st.textContent="Network error"; });
     });
 
-    // === FEED ===
+    // === FEED (2 colonnes fixes) ===
     const feed = document.getElementById("feed");
     function esc(s){return (s||"").replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
     function fmtDate(iso){ try{ return new Date(iso||Date.now()).toLocaleString(); } catch(e){ return ""; } }
@@ -293,7 +303,6 @@
             ' <button data-act="del">Delete</button></div>' : '');
         el.appendChild(head);
 
-        // Corps 2 colonnes
         const bodyWrap = document.createElement("div");
         bodyWrap.className = "post-body";
 
