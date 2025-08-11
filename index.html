@@ -27,11 +27,11 @@
     }
     .section{ max-width:100%; margin:30px auto 60px; padding:0 40px; text-align:left; display:flex; flex-direction:column; align-items:center; }
 
-    /* Bulle élargie */
+    /* Bulle (largeur d'origine) */
     .card{
       background-color:var(--card); border-radius:16px;
       padding:60px 60px 20px 60px;
-      max-width:1200px; /* élargi */
+      max-width:1000px; /* <= adapté 13" */
       width:100%;
       display:flex; flex-direction:column; gap:24px;
       backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
@@ -93,7 +93,7 @@
     .post-actions button{ padding:6px 9px; border:1px solid var(--btn-border); border-radius:8px; background:none; color:var(--muted); cursor:pointer; }
     .post-actions button:hover{ background:#555; color:#fff; border-color:#9a9a9a; }
 
-    /* Corps du post : texte à gauche, médias à droite (taille fixe) */
+    /* Corps du post : texte à gauche, médias à droite (contenus) */
     .post-body{ display:grid; grid-template-columns: 1fr 360px; gap:12px; align-items:start; }
     .post-text{ white-space:pre-wrap; line-height:1.55; color:#dcd5d5; }
     .media-col{ display:flex; flex-direction:column; gap:8px; }
@@ -150,14 +150,14 @@
 
       <!-- ADMIN PANEL -->
       <div id="adminPanel" class="admin-panel">
-        <!-- login group séparé pour ne cacher que lui -->
+        <!-- bloc login séparé -->
         <div id="adminLogin" style="display:flex; gap:10px; align-items:center;">
           <input id="adminPassword" type="password" placeholder="Admin password" autocomplete="off" />
           <button id="adminUse" class="admin-button">Use</button>
           <button id="adminCancel" class="admin-button">Cancel</button>
         </div>
 
-        <!-- Publisher -->
+        <!-- Editeur -->
         <div id="publisher" class="publish">
           <div class="row">
             <div>
@@ -192,7 +192,7 @@
     const POSTS_API = API_BASE + "/posts";
     const MEDIA_BASE = API_BASE + "/media/";
 
-    // === ADMIN UI (fix: ne cacher que le bloc login) ===
+    // === ADMIN UI (ne cacher que le bloc login) ===
     let ADMIN_TOKEN = sessionStorage.getItem("ns_admin_token") || "";
     const adminToggle = document.getElementById("adminToggle");
     const adminPanel  = document.getElementById("adminPanel");
@@ -235,8 +235,8 @@
     adminUse.addEventListener("click", ()=>{
       const t = adminPwd.value.trim(); if (!t) return;
       fetch(API_BASE + "/admin/verify", { method:"POST", headers:{ "Authorization":"Bearer " + t } })
-        .then(r=>r.json().then(j=>({ok:r.ok,j}))))
-        .then(x=>{
+        .then(r => r.json().then(j => ({ ok: r.ok, j })))
+        .then(x => {
           if(!x.ok || !x.j.ok){ alert("Wrong password"); return; }
           ADMIN_TOKEN = t; sessionStorage.setItem("ns_admin_token", t);
           refreshAdminUI(); loadPosts();
@@ -270,19 +270,19 @@
       for (let i=0;i<files.length;i++) fd.append("files", files[i]);
 
       fetch(POSTS_API, { method:"POST", headers:{ "Authorization":"Bearer " + ADMIN_TOKEN }, body: fd })
-      .then(r=>r.json().then(j=>({ok:r.ok,j})))
-      .then(x=>{
-        if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
-        document.getElementById("postTitle").value="";
-        document.getElementById("postBody").value="";
-        fileInput.value=""; fileCount.textContent="0";
-        st.textContent = "";
-        loadPosts();
-      })
-      .catch(()=>{ st.textContent="Network error"; });
+        .then(r => r.json().then(j => ({ ok: r.ok, j })))
+        .then(x => {
+          if(!x.ok){ st.textContent = (x.j && x.j.error) || "Error"; return; }
+          document.getElementById("postTitle").value="";
+          document.getElementById("postBody").value="";
+          fileInput.value=""; fileCount.textContent="0";
+          st.textContent = "";
+          loadPosts();
+        })
+        .catch(()=>{ st.textContent="Network error"; });
     });
 
-    // === FEED (2 colonnes fixes) ===
+    // === FEED (2 colonnes) ===
     const feed = document.getElementById("feed");
     function esc(s){return (s||"").replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
     function fmtDate(iso){ try{ return new Date(iso||Date.now()).toLocaleString(); } catch(e){ return ""; } }
